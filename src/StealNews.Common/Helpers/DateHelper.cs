@@ -18,7 +18,7 @@ namespace StealNews.Common.Helpers
 
             for (int i = 0; i < _months.Length; i++)
             {
-                if(parsedMonth.IndexOf(_months[i]) > 0)
+                if(parsedMonth.IndexOf(_months[i]) >= 0)
                 {
                     numberOfMounth = i + 1;
                     break;

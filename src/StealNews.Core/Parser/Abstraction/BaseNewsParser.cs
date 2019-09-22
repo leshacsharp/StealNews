@@ -4,6 +4,7 @@ using StealNews.Core.Parser.Models;
 using StealNews.Helpers.Common;
 using StealNews.Model.Entities;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace StealNews.Core.Parser.Abstraction

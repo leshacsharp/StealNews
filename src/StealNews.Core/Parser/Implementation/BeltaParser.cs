@@ -34,8 +34,12 @@ namespace StealNews.Core.Parser.Implementation
 
         protected override Task<Images> ParseImagesAsync(IHtmlDocument document)
         {
+            var siteUrl = document.QuerySelector("meta[property='og:url']").GetAttribute("content");
+            var siteUri = new Uri(siteUrl);
+            var siteHost = $"{siteUri.Scheme}://{siteUri.Host}";
+
             var mainImage = document.QuerySelector(".main_img > img").GetAttribute("src");
-            var additionalImages = document.QuerySelectorAll(".js-mediator-article > img").Select(im => im.GetAttribute("src"));
+            var additionalImages = document.QuerySelectorAll(".js-mediator-article img").Select(im => $"{siteHost}{im.GetAttribute("src")}");
 
             var images = new Images()
             {

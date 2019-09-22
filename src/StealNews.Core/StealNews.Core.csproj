@@ -1,7 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AngleSharp" Version="0.13.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StealNews.Common\StealNews.Common.csproj" />
+    <ProjectReference Include="..\StealNews.DataProvider\StealNews.DataProvider.csproj" />
+    <ProjectReference Include="..\StealNews.Model\StealNews.Model.csproj" />
+  </ItemGroup>
 
 </Project>

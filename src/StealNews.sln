@@ -5,13 +5,15 @@ VisualStudioVersion = 16.0.29230.47
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StealNews.WebAPI", "StealNews.WebAPI\StealNews.WebAPI.csproj", "{66068B65-0448-4158-8F2D-5BF5AC282F03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StealNews.Model", "StealNews.Model\StealNews.Model.csproj", "{081E1557-1E9C-4395-8387-DB9D4CAF4650}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StealNews.Model", "StealNews.Model\StealNews.Model.csproj", "{081E1557-1E9C-4395-8387-DB9D4CAF4650}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StealNews.DataProvider", "StealNews.DataProvider\StealNews.DataProvider.csproj", "{0DE58803-6426-43EA-997A-FFCEE928FF8E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StealNews.DataProvider", "StealNews.DataProvider\StealNews.DataProvider.csproj", "{0DE58803-6426-43EA-997A-FFCEE928FF8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StealNews.Common", "StealNews.Common\StealNews.Common.csproj", "{1185B5B5-C155-48A1-9DF5-08EB31E9345F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StealNews.Common", "StealNews.Common\StealNews.Common.csproj", "{1185B5B5-C155-48A1-9DF5-08EB31E9345F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StealNews.Core", "StealNews.Core\StealNews.Core.csproj", "{5F00226A-CA4D-4C69-ACF3-CFC1B2F2C8A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StealNews.Core", "StealNews.Core\StealNews.Core.csproj", "{5F00226A-CA4D-4C69-ACF3-CFC1B2F2C8A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StealNews.ConsoleTest", "StealNews.ConsoleTest\StealNews.ConsoleTest.csproj", "{9CBFB91F-5FD6-4B1C-B3B0-5D6BAB341341}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{5F00226A-CA4D-4C69-ACF3-CFC1B2F2C8A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F00226A-CA4D-4C69-ACF3-CFC1B2F2C8A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F00226A-CA4D-4C69-ACF3-CFC1B2F2C8A9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CBFB91F-5FD6-4B1C-B3B0-5D6BAB341341}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CBFB91F-5FD6-4B1C-B3B0-5D6BAB341341}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CBFB91F-5FD6-4B1C-B3B0-5D6BAB341341}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CBFB91F-5FD6-4B1C-B3B0-5D6BAB341341}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
