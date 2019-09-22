@@ -18,11 +18,15 @@ namespace StealNews.Core.Parser.Implementation
             var articleText = string.Join(Environment.NewLine, articleParagraps);
             var description = articleText.Substring(0, ParserConstants.COUNT_SYMBOLS_FOR_DESCRIPTIONS);
 
+            var dateString = document.QuerySelector(".date_full").TextContent;
+            var date = ParseDate(dateString);
+
             var commonInfo = new CommonInfo()
             {
                 Title = title,
                 Text = articleText,
                 Description = description,
+                CreatedDate = date
             };
 
             return Task.FromResult(commonInfo);
@@ -54,6 +58,18 @@ namespace StealNews.Core.Parser.Implementation
             };
 
             return Task.FromResult(category);
+        }
+
+        private DateTime ParseDate(string date)
+        {
+            var parsedDate = date.Split(",")[0];
+            var partsOfDate = parsedDate.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+            var day = Convert.ToInt32(partsOfDate[0]);
+            var month = Common.Helpers.DateHepler.GetMonthByName(partsOfDate[1]);
+            var year = Convert.ToInt32(partsOfDate[2]);
+
+            return new DateTime(year, month, day);
         }
     }
 }
