@@ -20,7 +20,7 @@ namespace StealNews.Model.Entities
 
         public IEnumerable<string> Images { get; set; }
 
-        public IEnumerable<Category> Categories { get; set; }
+        public Category Category { get; set; }
 
         public Source Source { get; set; }
     }

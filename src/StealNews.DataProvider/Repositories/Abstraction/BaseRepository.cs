@@ -16,18 +16,18 @@ namespace StealNews.DataProvider.Repositories.Abstraction
             Collection = DB.Set<TEntity>();
         }    
 
-        public async Task Add(TEntity entity)
+        public async Task AddAsync(TEntity entity)
         {
             await Collection.InsertOneAsync(entity);
         }
 
-        public async Task Delete(TEntity entity)
+        public async Task DeleteAsync(TEntity entity)
         {
             var deleteFilter = Builders<TEntity>.Filter.Eq(p => p.Id, entity.Id);
             await Collection.DeleteOneAsync(deleteFilter);
         }
 
-        public async Task Update(TEntity entity)
+        public async Task UpdateAsync(TEntity entity)
         {
             var updateFilter = Builders<TEntity>.Filter.Eq(p => p.Id, entity.Id);
             await Collection.ReplaceOneAsync(updateFilter, entity);

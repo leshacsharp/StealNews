@@ -5,8 +5,8 @@ namespace StealNews.DataProvider.Repositories.Abstraction
 {
     public interface IBaseRepository<TEntity> where TEntity : IMongoEntity
     {
-        Task Add(TEntity entity);
-        Task Delete(TEntity entity);
-        Task Update(TEntity entity);
+        Task AddAsync(TEntity entity);
+        Task DeleteAsync(TEntity entity);
+        Task UpdateAsync(TEntity entity);
     }
 }
