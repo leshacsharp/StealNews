@@ -23,5 +23,18 @@ namespace StealNews.Model.Entities
         public Category Category { get; set; }
 
         public Source Source { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            var news = obj as News;
+
+            if(news == null)
+                return false;
+
+            return news.Title == this.Title 
+                && news.Category.Title == this.Category.Title 
+                && news.Text == this.Text 
+                && news.Source.SiteTitle == this.Source.SiteTitle;
+        }
     }
 }
