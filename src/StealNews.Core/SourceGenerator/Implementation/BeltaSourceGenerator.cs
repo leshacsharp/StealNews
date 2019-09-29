@@ -14,11 +14,11 @@ namespace StealNews.Core.SourceGenerator.Implementation
 {
     public class BeltaSourceGenerator : ISourceGenerator
     {
-        public async Task<IEnumerable<string>> GenerateAsync(Source source, int count, int skip = 0)
+        public async Task<IEnumerable<string>> GenerateAsync(string siteTemplate, int count, int skip = 0)
         {
-            if(source == null)
+            if(siteTemplate == null)
             {
-                throw new ArgumentNullException(nameof(source));
+                throw new ArgumentNullException(nameof(siteTemplate));
             }
             if (count < 0)
             {
@@ -44,7 +44,7 @@ namespace StealNews.Core.SourceGenerator.Implementation
 
             do
             {   
-                var sourceUrl = string.Format(source.SiteTemplate, page);
+                var sourceUrl = string.Format(siteTemplate, page);
                 var html = await HttpReader.ReadAsync(sourceUrl, httpClient);
 
                 var document = await parser.ParseDocumentAsync(html, CancellationToken.None);

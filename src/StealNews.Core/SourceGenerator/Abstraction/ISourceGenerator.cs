@@ -6,6 +6,6 @@ namespace StealNews.Core.SourceGenerator.Abstraction
 {
     public interface ISourceGenerator
     {
-        Task<IEnumerable<string>> GenerateAsync(Source source, int count, int skip = 0);
+        Task<IEnumerable<string>> GenerateAsync(string source, int count, int skip = 0);
     }
 }

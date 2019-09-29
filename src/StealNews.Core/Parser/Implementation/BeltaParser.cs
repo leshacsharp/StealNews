@@ -52,7 +52,7 @@ namespace StealNews.Core.Parser.Implementation
 
         protected override Task<Category> ParseCategoriesAsync(IHtmlDocument document)
         {
-            var categoryTitle = document.QuerySelector(".content_margin > h1").TextContent;
+            var categoryTitle = document.QuerySelector(".content_margin > a").TextContent;
             var subCategoriesTitles = document.QuerySelectorAll(".tag_item").Select(c => c.TextContent);
 
             var category = new Category()
