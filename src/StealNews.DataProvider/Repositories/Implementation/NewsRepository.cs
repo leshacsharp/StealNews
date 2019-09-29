@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Options;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using StealNews.DataProvider.Repositories.Abstraction;
 using StealNews.DataProvider.Settings;
 using StealNews.Model.Entities;
@@ -11,6 +13,11 @@ namespace StealNews.DataProvider.Repositories.Implementation
             : base(connectionString.Value.ConnectionString)
         {
 
+        }
+
+        public async Task BulkInsertAsync(IEnumerable<News> news)
+        {
+            await DB.News.InsertManyAsync(news);
         }
     }
 }
