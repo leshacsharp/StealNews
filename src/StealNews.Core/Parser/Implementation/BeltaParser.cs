@@ -16,7 +16,11 @@ namespace StealNews.Core.Parser.Implementation
             var title = document.QuerySelector(".content_margin > h1").TextContent;
             var articleParagraps = document.QuerySelectorAll(".js-mediator-article > p").Select(p => p.TextContent);
             var articleText = string.Join(Environment.NewLine, articleParagraps);
+
             var description = articleText.Substring(0, ParserConstants.COUNT_SYMBOLS_FOR_DESCRIPTIONS);
+            var words = description.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
+            words.RemoveAt(words.Count - 1);
+            var parsedDescription = $"{string.Join(" ", words)}...";
 
             var dateString = document.QuerySelector(".date_full").TextContent;
             var date = ParseDate(dateString);
@@ -25,7 +29,7 @@ namespace StealNews.Core.Parser.Implementation
             {
                 Title = title,
                 Text = articleText,
-                Description = description,
+                Description = parsedDescription,
                 CreatedDate = date
             };
 
@@ -34,13 +38,11 @@ namespace StealNews.Core.Parser.Implementation
 
         protected override Task<Images> ParseImagesAsync(IHtmlDocument document)
         {
-            var siteUrl = document.QuerySelector("meta[property='og:url']").GetAttribute("content");
-            var siteUri = new Uri(siteUrl);
-            var siteHost = $"{siteUri.Scheme}://{siteUri.Host}";
+            var baseSiteUrl = GetBaseSiteUrl(document);
 
             var mainImageSrc = document.QuerySelector(".main_img > img")?.GetAttribute("src");
             var mainImage = mainImageSrc != null ? mainImageSrc : ParserConstants.DEFAULT_MAIN_IMAGE;
-            var additionalImages = document.QuerySelectorAll(".js-mediator-article img").Select(im => $"{siteHost}{im.GetAttribute("src")}");
+            var additionalImages = document.QuerySelectorAll(".js-mediator-article img").Select(im => $"{baseSiteUrl}{im.GetAttribute("src")}");
 
             var images = new Images()
             {
@@ -63,6 +65,22 @@ namespace StealNews.Core.Parser.Implementation
             };
 
             return Task.FromResult(category);
+        }
+
+        protected override Task<string> ParseSourceLogoAsync(IHtmlDocument document)
+        {
+            var baseSiteUrl = GetBaseSiteUrl(document);
+            var logoUrl = document.QuerySelector("link[rel=icon]").GetAttribute("href");
+            var fullLogoUrl = $"{baseSiteUrl}{logoUrl}";
+
+            return Task.FromResult(fullLogoUrl);
+        }
+
+        private string GetBaseSiteUrl(IHtmlDocument document)
+        {
+            var siteUrl = document.QuerySelector("meta[property='og:url']").GetAttribute("content");
+            var siteUri = new Uri(siteUrl);
+            return $"{siteUri.Scheme}://{siteUri.Host}";
         }
 
         private DateTime ParseDate(string date)

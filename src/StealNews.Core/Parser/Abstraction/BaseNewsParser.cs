@@ -21,7 +21,7 @@ namespace StealNews.Core.Parser.Abstraction
             var sourceInfo = new Source()
             {
                 SiteTitle = uri.Host.Remove(0, 4),
-                SiteUrl = $"{uri.Scheme}://{uri.Host}"
+                SiteUrl = $"{uri.Scheme}://{uri.Host}",
             };
 
 
@@ -32,12 +32,16 @@ namespace StealNews.Core.Parser.Abstraction
             var commonInfoTask = ParseCommonInfoAsync(document);
             var categoriesTask = ParseCategoriesAsync(document);
             var imagesTask = ParseImagesAsync(document);
+            var sourceLogoTask = ParseSourceLogoAsync(document);
 
-            await Task.WhenAll(commonInfoTask, categoriesTask, imagesTask);
+            await Task.WhenAll(commonInfoTask, categoriesTask, imagesTask, sourceLogoTask);
+
+            sourceInfo.SiteLogo = sourceLogoTask.Result;
 
             var newsItem = new News()
             {
                 Title = commonInfoTask.Result.Title,
+                Url = source,
                 Text = commonInfoTask.Result.Text,
                 Description = commonInfoTask.Result.Description,
                 CreatedDate = commonInfoTask.Result.CreatedDate,
@@ -55,5 +59,7 @@ namespace StealNews.Core.Parser.Abstraction
         protected abstract Task<Category> ParseCategoriesAsync(IHtmlDocument document);
 
         protected abstract Task<Images> ParseImagesAsync(IHtmlDocument document);
+
+        protected abstract Task<string> ParseSourceLogoAsync(IHtmlDocument document);
     }
 }
