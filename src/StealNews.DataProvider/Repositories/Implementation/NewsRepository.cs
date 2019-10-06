@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using StealNews.DataProvider.Repositories.Abstraction;
 using StealNews.DataProvider.Settings;
@@ -31,6 +30,17 @@ namespace StealNews.DataProvider.Repositories.Implementation
         public async Task<IEnumerable<Category>> GetCategoriesAsync()
         {
             FieldDefinition<News, Category> field = nameof(Category);
+            var filter = Builders<News>.Filter.Empty;
+
+            var cursor = await Collection.DistinctAsync(field, filter);
+            await cursor.MoveNextAsync();
+
+            return cursor.Current;
+        }
+
+        public async Task<IEnumerable<Source>> GetSourcesAsync()
+        {
+            FieldDefinition<News, Source> field = nameof(Source);
             var filter = Builders<News>.Filter.Empty;
 
             var cursor = await Collection.DistinctAsync(field, filter);

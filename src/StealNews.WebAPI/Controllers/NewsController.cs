@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StealNews.Core.Services.Abstraction;
-using StealNews.Model.Models.Service;
+using StealNews.Model.Models.Service.News;
 using System.Threading.Tasks;
 
 namespace StealNews.WebAPI.Controllers

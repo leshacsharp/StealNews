@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
 using StealNews.Core.ComponentsFactory;
-using StealNews.Model.Models.Service;
 using StealNews.Core.Services.Abstraction;
 using StealNews.Core.Settings;
 using StealNews.DataProvider.Repositories.Abstraction;
@@ -10,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using StealNews.Model.Models.Service.News;
 
 namespace StealNews.Core.Services.Implementation
 {
@@ -158,20 +158,6 @@ namespace StealNews.Core.Services.Implementation
             }
 
             return await _newsRepository.FindAsync(filter, filterModel.Count, filterModel.Skip);
-        }
-
-        public async Task<IEnumerable<Category>> GetCategoriesAsync()
-        {
-            var categories = await _newsRepository.GetCategoriesAsync();
-
-            return categories.GroupBy(c => c.Title)
-                             .Select(c => new Category()
-                             {
-                                 Title = c.Key,
-                                 SubCategories = c.SelectMany(p => p.SubCategories)
-                                                  .Distinct()
-                             });
-                                    
         }
     }
 }

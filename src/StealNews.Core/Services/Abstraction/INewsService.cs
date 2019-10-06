@@ -1,7 +1,7 @@
 ﻿using StealNews.Model.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using StealNews.Model.Models.Service;
+using StealNews.Model.Models.Service.News;
 
 namespace StealNews.Core.Services.Abstraction
 {
@@ -9,6 +9,5 @@ namespace StealNews.Core.Services.Abstraction
     {
         Task<IEnumerable<News>> GenerateNewsAsync();
         Task<IEnumerable<News>> FindAsync(NewsFindFilter filter);
-        Task<IEnumerable<Category>> GetCategoriesAsync();
     }
 }

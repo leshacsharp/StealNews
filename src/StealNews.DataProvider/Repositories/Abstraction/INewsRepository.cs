@@ -9,6 +9,7 @@ namespace StealNews.DataProvider.Repositories.Abstraction
     {
         Task<IEnumerable<News>> FindAsync(FilterDefinition<News> filter, int count = 100, int skip = 0);
         Task<IEnumerable<Category>> GetCategoriesAsync();
+        Task<IEnumerable<Source>> GetSourcesAsync();
         Task BulkInsertAsync(IEnumerable<News> news);
     }
 }

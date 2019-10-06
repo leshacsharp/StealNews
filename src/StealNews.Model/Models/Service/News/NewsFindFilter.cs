@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace StealNews.Model.Models.Service
+namespace StealNews.Model.Models.Service.News
 {
     public class NewsFindFilter
     {

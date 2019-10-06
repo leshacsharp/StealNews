@@ -9,6 +9,7 @@ namespace StealNews.Core.Ioc
         public static void AddCoreDependencies(this IServiceCollection services)
         {
             services.AddScoped<INewsService, NewsService>();
+            services.AddScoped<IConfigurationService, ConfigurationService>();
         }
     }
 }
