@@ -86,14 +86,14 @@ namespace StealNews.Core.Services.Implementation
 
                         foreach (var news in part.News)
                         {
-                            if(isLastNewsFinded)
-                            {
-                                generatedNews.Add(news);
-                            }
-                            
-                            if(lastNews.Equals(news))
+                            if (news.Equals(lastNews) || lastNews == null)
                             {
                                 isLastNewsFinded = true;
+                            }
+
+                            if (isLastNewsFinded)
+                            {
+                                generatedNews.Add(news);
                             }
                         }
                     }
