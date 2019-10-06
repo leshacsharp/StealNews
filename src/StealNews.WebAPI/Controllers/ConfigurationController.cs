@@ -15,7 +15,7 @@ namespace StealNews.WebAPI.Controllers
         }
 
         [HttpGet]
-        [Route("get-configuration")]
+        [Route("get")]
         public async Task<IActionResult> GetConfiguration()
         {
             var configuration = await _configurationService.GetAsync();
