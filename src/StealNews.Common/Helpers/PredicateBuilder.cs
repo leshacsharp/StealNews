@@ -18,21 +18,21 @@ namespace StealNews.Common.Helpers
         public static Expression<Func<TEntity, bool>> And<TEntity>(this Expression<Func<TEntity, bool>> first,
                                                                         Expression<Func<TEntity, bool>> second)
         {
-            var parametr = first.Parameters[0];
-            var firstInvokedExp = Expression.Invoke(first);
-            var secondInvokedExp = Expression.Invoke(second);
+            var parametrs = first.Parameters;
+            var firstInvokedExp = Expression.Invoke(first, parametrs);
+            var secondInvokedExp = Expression.Invoke(second, parametrs);
 
-            return Expression.Lambda<Func<TEntity, bool>>(Expression.And(firstInvokedExp, secondInvokedExp), parametr);
+            return Expression.Lambda<Func<TEntity, bool>>(Expression.AndAlso(firstInvokedExp, secondInvokedExp), parametrs);
         }
 
         public static Expression<Func<TEntity, bool>> Or<TEntity>(this Expression<Func<TEntity, bool>> first,
                                                                         Expression<Func<TEntity, bool>> second)
         {
-            var parametr = first.Parameters[0];
-            var firstInvokedExp = Expression.Invoke(first);
-            var secondInvokedExp = Expression.Invoke(second);
+            var parametrs = first.Parameters;
+            var firstInvokedExp = Expression.Invoke(first, parametrs);
+            var secondInvokedExp = Expression.Invoke(second, parametrs);
 
-            return Expression.Lambda<Func<TEntity, bool>>(Expression.Or(firstInvokedExp, secondInvokedExp), parametr);
+            return Expression.Lambda<Func<TEntity, bool>>(Expression.OrElse(firstInvokedExp, secondInvokedExp), parametrs);
         }
     }
 }

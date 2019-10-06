@@ -1,9 +1,6 @@
 ﻿using MongoDB.Driver;
 using StealNews.DataProvider.Context;
 using StealNews.Model.Entities;
-using System;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace StealNews.DataProvider.Repositories.Abstraction
@@ -34,11 +31,6 @@ namespace StealNews.DataProvider.Repositories.Abstraction
         {
             var updateFilter = Builders<TEntity>.Filter.Eq(p => p.Id, entity.Id);
             await Collection.ReplaceOneAsync(updateFilter, entity);
-        }
-
-        public IQueryable<TEntity> Read(Expression<Func<TEntity, bool>> predicate)
-        {
-            return Collection.AsQueryable().Where(predicate);
-        }
+        } 
     }
 }

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace StealNews.Core.Models
+namespace StealNews.Model.Models.Service
 {
     public class NewsFindFilter
     {
@@ -17,5 +17,9 @@ namespace StealNews.Core.Models
         public IEnumerable<string> Categories { get; set; }
 
         public ObjectId? AfterId { get; set; }
+
+        public int Count { get; set; }
+
+        public int Skip { get; set; }
     }
 }
