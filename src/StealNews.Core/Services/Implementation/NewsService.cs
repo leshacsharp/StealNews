@@ -23,9 +23,10 @@ namespace StealNews.Core.Services.Implementation
             _newsRepository = newsRepository;
             _sourceConfiguration = sources.Value;
         }
-
+  
         public async Task<IEnumerable<News>> GenerateNewsAsync()
         {
+            //Order of adding important
             var generatedNews = new List<News>();
 
             foreach (var source in _sourceConfiguration.Sources)
@@ -42,7 +43,9 @@ namespace StealNews.Core.Services.Implementation
                 var lastNews = newsBySource.OrderByDescending(n => n.Id).FirstOrDefault();
 
                 IEnumerable<string> sourcesUrl = null;
+                var partsOfNews = new List<PartOfNews>();
                 var isLastNewsFinded = false;
+                var isPageHaveLastNews = false;
 
                 do
                 {
@@ -52,21 +55,53 @@ namespace StealNews.Core.Services.Implementation
                     {
                         var news = await htmlParser.ParseAsync(sourceUrl);
 
-                        if (isLastNewsFinded)
-                        {
-                            newNewsBySource.Add(news);
-                        }
-
                         if (news.Equals(lastNews) || lastNews == null)
                         {
+                            isPageHaveLastNews = true;
                             isLastNewsFinded = true;
                         }
+
+                        newNewsBySource.Add(news);
                     }
 
-                    generatedNews.AddRange(newNewsBySource);
+                    var partOfNews = new PartOfNews()
+                    {
+                        News = newNewsBySource,
+                        IsPageHaveLastNews = isPageHaveLastNews
+                    };
+
+                    partsOfNews.Add(partOfNews);
                     skipNews += _sourceConfiguration.CountGeneratedNewsFor1Time;
                 }
                 while (!isLastNewsFinded && lastNews != null && sourcesUrl.Count() > 0);
+
+
+                for (int i = partsOfNews.Count - 1; i >= 0; i--)
+                {
+                    var part = partsOfNews[i];
+                
+                    if (part.IsPageHaveLastNews)
+                    {
+                        isLastNewsFinded = false;
+
+                        foreach (var news in part.News)
+                        {
+                            if(isLastNewsFinded)
+                            {
+                                generatedNews.Add(news);
+                            }
+                            
+                            if(lastNews.Equals(news))
+                            {
+                                isLastNewsFinded = true;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        generatedNews.AddRange(part.News);
+                    }
+                }
             }
 
             if (generatedNews.Count > 0)
@@ -140,4 +175,3 @@ namespace StealNews.Core.Services.Implementation
         }
     }
 }
-
