@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
-using StealNews.Common.Helpers;
 using StealNews.Core.ComponentsFactory;
-using StealNews.Core.Models;
+using StealNews.Model.Models.Service;
 using StealNews.Core.Services.Abstraction;
 using StealNews.Core.Settings;
 using StealNews.DataProvider.Repositories.Abstraction;
@@ -10,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MongoDB.Driver;
 
 namespace StealNews.Core.Services.Implementation
 {
@@ -36,9 +36,10 @@ namespace StealNews.Core.Services.Implementation
 
                 var newNewsBySource = new List<News>();
                 var skipNews = 0;
-                var lastNews = _newsRepository.Read(news => news.Source.SiteTitle == source.SiteTitle)
-                                              .OrderByDescending(n => n.Id)
-                                              .Take(1);
+
+                var filterBySource = Builders<News>.Filter.Where(n => n.Source.SiteTitle == source.SiteTitle);
+                var newsBySource = await _newsRepository.FindAsync(filterBySource);
+                var lastNews = newsBySource.OrderByDescending(n => n.Id).FirstOrDefault();
 
                 IEnumerable<string> sourcesUrl = null;
                 var isLastNewsFinded = false;
@@ -51,65 +52,92 @@ namespace StealNews.Core.Services.Implementation
                     {
                         var news = await htmlParser.ParseAsync(sourceUrl);
 
-                        if(news.Equals(lastNews))
+                        if (isLastNewsFinded)
                         {
-                            isLastNewsFinded = true;
-                            break;
+                            newNewsBySource.Add(news);
                         }
 
-                        newNewsBySource.Add(news);
+                        if (news.Equals(lastNews) || lastNews == null)
+                        {
+                            isLastNewsFinded = true;
+                        }
                     }
 
                     generatedNews.AddRange(newNewsBySource);
                     skipNews += _sourceConfiguration.CountGeneratedNewsFor1Time;
                 }
-                while (!isLastNewsFinded && sourcesUrl.Count() > 0);
+                while (!isLastNewsFinded && lastNews != null && sourcesUrl.Count() > 0);
             }
 
-            await _newsRepository.BulkInsertAsync(generatedNews);
+            if (generatedNews.Count > 0)
+            {
+                await _newsRepository.BulkInsertAsync(generatedNews);
+            }
+
             return generatedNews;
         }
 
-        public IEnumerable<News> Find(NewsFindFilter filter)
+        public async Task<IEnumerable<News>> FindAsync(NewsFindFilter filterModel)
         {
-            if(filter == null)
+            if (filterModel == null)
             {
-                throw new ArgumentNullException(nameof(filter));
+                throw new ArgumentNullException(nameof(filterModel));
             }
 
-            var predicate = PredicateBuilder.True<News>();
-
-            if (filter.Categories != null)
+            if (filterModel.Count <= 0 || filterModel.Skip < 0)
             {
-                predicate = predicate.And(news => filter.Categories.Contains(news.Category.Title) || filter.Categories.Any(cat => news.Category.SubCategories.Contains(cat)));
+                return await Task.FromResult(Enumerable.Empty<News>());
             }
 
-            if (filter.Sources != null)
+            var builder = Builders<News>.Filter;
+            var filter = builder.Empty;
+
+            if (filterModel.Categories != null)
             {
-                predicate = predicate.And(news => filter.Sources.Contains(news.Source.SiteTitle));
+                filter = filter & builder.Where(n => filterModel.Categories.Contains(n.Category.Title) || filterModel.Categories.Any(c => n.Category.SubCategories.Contains(c)));
             }
 
-            if (filter.KeyWord != null)
+            if (filterModel.Sources != null)
             {
-                predicate = predicate.And(news => news.Title.Contains(filter.KeyWord) || news.Text.Contains(filter.KeyWord));
+                filter = filter & builder.Where(n => filterModel.Sources.Contains(n.Source.SiteTitle));
             }
 
-            if (filter.From != null)
+            if (filterModel.KeyWord != null)
             {
-                predicate = predicate.And(news => news.CreatedDate >= filter.From);
+                filter = filter & builder.Where(n => n.Title.Contains(filterModel.KeyWord) || n.Text.Contains(filterModel.KeyWord));
             }
 
-            if (filter.To != null)
+            if (filterModel.From != null)
             {
-                predicate = predicate.And(news => news.CreatedDate <= filter.To);
-            }  
-
-            if(filter.AfterId != null)
-            {
-                predicate = predicate.And(news => news.Id > filter.AfterId);
+                filter = filter & builder.Where(n => n.CreatedDate >= filterModel.From);
             }
 
-            return _newsRepository.Read(predicate).ToList();
+            if (filterModel.To != null)
+            {
+                filter = filter & builder.Where(n => n.CreatedDate <= filterModel.To);
+            }
+
+            if (filterModel.AfterId != null)
+            {
+                filter = filter & builder.Where(n => n.Id > filterModel.AfterId);
+            }
+
+            return await _newsRepository.FindAsync(filter, filterModel.Count, filterModel.Skip);
+        }
+
+        public async Task<IEnumerable<Category>> GetCategoriesAsync()
+        {
+            var categories = await _newsRepository.GetCategoriesAsync();
+
+            return categories.GroupBy(c => c.Title)
+                             .Select(c => new Category()
+                             {
+                                 Title = c.Key,
+                                 SubCategories = c.SelectMany(p => p.SubCategories)
+                                                  .Distinct()
+                             });
+                                    
         }
     }
 }
+

@@ -1,10 +1,9 @@
 ﻿using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
-using StealNews.Core.Parser.Models;
+using StealNews.Model.Models.Parser;
 using StealNews.Helpers.Common;
 using StealNews.Model.Entities;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace StealNews.Core.Parser.Abstraction

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StealNews.Core.Parser.Models
+namespace StealNews.Model.Models.Parser
 {
     public class CommonInfo
     {

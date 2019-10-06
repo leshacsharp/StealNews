@@ -31,12 +31,15 @@ namespace StealNews.Core.SourceGenerator.Implementation
  
             var sources = new List<string>();
 
+            var siteUri = new Uri(siteTemplate);
+            var baseSiteUrl = $"{siteUri.Scheme}://{siteUri.Host}";
+
             var hch = new HttpClientHandler() { Proxy = null, UseProxy = false };
             var httpClient = new HttpClient(hch);
             var parser = new HtmlParser();
 
             var countItemsOnPage = 30;
-            var skipedPage = skip < countItemsOnPage ? 1 : (int)Math.Floor((double)skip / countItemsOnPage);
+            var skipedPage = (int)Math.Floor((double)skip / countItemsOnPage);
             var skipeditems = skip - skipedPage * countItemsOnPage;
             var page = skipedPage + 1;
 
@@ -50,13 +53,13 @@ namespace StealNews.Core.SourceGenerator.Implementation
                 var document = await parser.ParseDocumentAsync(html, CancellationToken.None);
                 htmlElements = document.QuerySelectorAll(".news_item.lenta_item > a");
 
-                for (int i = skipeditems + 1; i < htmlElements.Count(); i++)
+                for (int i = skipeditems; i < htmlElements.Count(); i++)
                 {
                     var sourceHref = htmlElements[i].GetAttribute("href");
 
                     if(sources.Count < count)
                     {
-                        sources.Add(sourceHref);
+                        sources.Add($"{baseSiteUrl}{sourceHref}");
                     }
                 }
 
@@ -65,6 +68,7 @@ namespace StealNews.Core.SourceGenerator.Implementation
             }
             while (sources.Count < count && htmlElements.Count() > 0);
 
+            sources.Reverse();
             return sources;
         }
     }

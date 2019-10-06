@@ -1,6 +1,6 @@
 ﻿using AngleSharp.Html.Dom;
 using StealNews.Core.Parser.Abstraction;
-using StealNews.Core.Parser.Models;
+using StealNews.Model.Models.Parser;
 using StealNews.Core.Settings;
 using StealNews.Model.Entities;
 using System;
@@ -38,7 +38,8 @@ namespace StealNews.Core.Parser.Implementation
             var siteUri = new Uri(siteUrl);
             var siteHost = $"{siteUri.Scheme}://{siteUri.Host}";
 
-            var mainImage = document.QuerySelector(".main_img > img").GetAttribute("src");
+            var mainImageSrc = document.QuerySelector(".main_img > img")?.GetAttribute("src");
+            var mainImage = mainImageSrc != null ? mainImageSrc : ParserConstants.DEFAULT_MAIN_IMAGE;
             var additionalImages = document.QuerySelectorAll(".js-mediator-article img").Select(im => $"{siteHost}{im.GetAttribute("src")}");
 
             var images = new Images()
@@ -58,7 +59,7 @@ namespace StealNews.Core.Parser.Implementation
             var category = new Category()
             {
                 Title = categoryTitle,
-                SubCategories = subCategoriesTitles.Select(cat => new Category() { Title = cat })
+                SubCategories = subCategoriesTitles
             };
 
             return Task.FromResult(category);

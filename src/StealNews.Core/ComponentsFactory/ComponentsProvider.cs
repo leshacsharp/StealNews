@@ -11,11 +11,14 @@ namespace StealNews.Core.ComponentsFactory
                 throw new ArgumentNullException(nameof(sourceTitle));
             }
 
-            return sourceTitle switch
+            IComponentsFactory componentsFactory = null;
+
+            switch(sourceTitle)
             {
-                "belta.by" => new BeltaComponentsFactory(),
-                _    => null
-            };
+                case "belta.by": componentsFactory = new BeltaComponentsFactory(); break;    
+            }
+
+            return componentsFactory;
         }
     }
 }

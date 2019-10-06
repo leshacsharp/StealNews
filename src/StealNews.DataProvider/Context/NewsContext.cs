@@ -1,6 +1,7 @@
 ﻿using MongoDB.Driver;
 using StealNews.Model.Entities;
 using System;
+using System.Security.Authentication;
 
 namespace StealNews.DataProvider.Context
 {
@@ -15,9 +16,12 @@ namespace StealNews.DataProvider.Context
                 throw new ArgumentNullException(nameof(connectionString));
             }
 
-            var databaseName = new MongoUrl(connectionString).DatabaseName;
-            var client = new MongoClient(connectionString);
-            _db = client.GetDatabase(databaseName);
+            var mongoUrl = new MongoUrl(connectionString);
+            MongoClientSettings settings = MongoClientSettings.FromUrl(mongoUrl);  
+            settings.SslSettings = new SslSettings() { EnabledSslProtocols = SslProtocols.Tls12 }; 
+
+            var client = new MongoClient(settings);
+            _db = client.GetDatabase(mongoUrl.DatabaseName);
         }
 
         public IMongoCollection<News> News
@@ -30,7 +34,7 @@ namespace StealNews.DataProvider.Context
 
         public IMongoCollection<TEntity> Set<TEntity>() where TEntity : IMongoEntity
         {
-            return _db.GetCollection<TEntity>(nameof(TEntity));
+            return _db.GetCollection<TEntity>(typeof(TEntity).Name);
         }
     }
 }

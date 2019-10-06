@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace StealNews.Core.Parser.Models
+namespace StealNews.Model.Models.Parser
 {
     public class Images
     {
