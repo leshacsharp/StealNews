@@ -152,11 +152,6 @@ namespace StealNews.Core.Services.Implementation
                 filter = filter & builder.Where(n => n.CreatedDate <= filterModel.To);
             }
 
-            if (filterModel.AfterId != null)
-            {
-                filter = filter & builder.Where(n => n.Id > filterModel.AfterId);
-            }
-
             return await _newsRepository.FindAsync(filter, filterModel.Count, filterModel.Skip);
         }
     }

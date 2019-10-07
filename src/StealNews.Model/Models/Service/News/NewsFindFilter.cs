@@ -16,8 +16,6 @@ namespace StealNews.Model.Models.Service.News
 
         public IEnumerable<string> Categories { get; set; }
 
-        public ObjectId? AfterId { get; set; }
-
         public int Count { get; set; }
 
         public int Skip { get; set; }
