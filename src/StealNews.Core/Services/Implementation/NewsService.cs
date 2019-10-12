@@ -23,7 +23,7 @@ namespace StealNews.Core.Services.Implementation
             _newsRepository = newsRepository;
             _sourceConfiguration = sources.Value;
         }
-  
+
         public async Task<IEnumerable<News>> GenerateNewsAsync()
         {
             //Order of adding important
@@ -33,23 +33,27 @@ namespace StealNews.Core.Services.Implementation
             {
                 var componentsFabric = ComponentsProvider.CreateComponentsFactory(source.SiteTitle);
                 var sourceGenerator = componentsFabric.CreateSourceGenertor();
+                var sourceValidator = componentsFabric.CreateSourceValidator();
                 var htmlParser = componentsFabric.CreateNewsParser();
-
-                var newNewsBySource = new List<News>();
-                var skipNews = 0;
 
                 var filterBySource = Builders<News>.Filter.Where(n => n.Source.SiteTitle == source.SiteTitle);
                 var newsBySource = await _newsRepository.FindAsync(filterBySource);
                 var lastNews = newsBySource.OrderByDescending(n => n.Id).FirstOrDefault();
 
-                IEnumerable<string> sourcesUrl = null;
                 var partsOfNews = new List<PartOfNews>();
+                IEnumerable<string> sourcesUrl = null;
+                ICollection<News> newNewsBySource = null;
                 var isLastNewsFinded = false;
                 var isPageHaveLastNews = false;
+                var skipNews = 0;
 
                 do
                 {
                     sourcesUrl = await sourceGenerator.GenerateAsync(source.SiteTemplate, _sourceConfiguration.CountGeneratedNewsFor1Time, skipNews);
+                    sourcesUrl = await sourceValidator.ValidateAsync(sourcesUrl);
+                    sourcesUrl = sourcesUrl.Reverse();
+
+                    newNewsBySource = new List<News>();
 
                     foreach (var sourceUrl in sourcesUrl)
                     {
@@ -79,21 +83,21 @@ namespace StealNews.Core.Services.Implementation
                 for (int i = partsOfNews.Count - 1; i >= 0; i--)
                 {
                     var part = partsOfNews[i];
-                
+
                     if (part.IsPageHaveLastNews)
                     {
                         isLastNewsFinded = false;
 
                         foreach (var news in part.News)
                         {
-                            if (news.Equals(lastNews) || lastNews == null)
-                            {
-                                isLastNewsFinded = true;
-                            }
-
                             if (isLastNewsFinded)
                             {
                                 generatedNews.Add(news);
+                            }
+
+                            if (news.Equals(lastNews) || lastNews == null)
+                            {
+                                isLastNewsFinded = true;
                             }
                         }
                     }

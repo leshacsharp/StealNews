@@ -1,6 +1,5 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
-using StealNews.Core.Settings;
 using StealNews.Core.SourceGenerator.Abstraction;
 using StealNews.Helpers.Common;
 using System;
@@ -57,10 +56,10 @@ namespace StealNews.Core.SourceGenerator.Implementation
                 {
                     var sourceHref = htmlElements[i].GetAttribute("href");
 
-                    if(sources.Count < count)
-                    {
-                        sources.Add($"{baseSiteUrl}{sourceHref}");
-                    }
+                    if (sources.Count == count)
+                        break;
+
+                    sources.Add($"{baseSiteUrl}{sourceHref}");
                 }
 
                 skipeditems = 0;
@@ -68,7 +67,6 @@ namespace StealNews.Core.SourceGenerator.Implementation
             }
             while (sources.Count < count && htmlElements.Count() > 0);
 
-            sources.Reverse();
             return sources;
         }
     }

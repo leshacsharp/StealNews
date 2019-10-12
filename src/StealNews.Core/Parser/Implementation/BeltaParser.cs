@@ -40,8 +40,7 @@ namespace StealNews.Core.Parser.Implementation
         {
             var baseSiteUrl = GetBaseSiteUrl(document);
 
-            var mainImageSrc = document.QuerySelector(".main_img > img")?.GetAttribute("src");
-            var mainImage = mainImageSrc != null ? mainImageSrc : ParserConstants.DEFAULT_MAIN_IMAGE;
+            var mainImage = document.QuerySelector(".main_img > img").GetAttribute("src");
             var additionalImages = document.QuerySelectorAll(".js-mediator-article img").Select(im => $"{baseSiteUrl}{im.GetAttribute("src")}");
 
             var images = new Images()
