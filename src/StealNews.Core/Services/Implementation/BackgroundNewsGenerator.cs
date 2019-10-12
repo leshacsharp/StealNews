@@ -23,21 +23,23 @@ namespace StealNews.Core.Services.Implementation
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while(!stoppingToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
             {
                 var currentHours = DateTime.UtcNow.Hour;
-                if (currentHours > _workersConfiguration.TimeOfEndingWorkersHours && currentHours < _workersConfiguration.TimeOfStartingWorkersHours)
+                if (currentHours > _workersConfiguration.TimeOfStartingWorkersHoursUtc && currentHours < _workersConfiguration.TimeOfEndingWorkersHoursUtc)
+                {
+                    await _newsService.GenerateNewsAsync();
+
+                    await Task.Delay(_workersConfiguration.BackgroundNewsGeneratorTimeOutSec * 100, stoppingToken);
+                }
+                else
                 {
                     var utcNow = DateTime.UtcNow;
-                    var dateOfStartingWorkers = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day + 1, _workersConfiguration.TimeOfStartingWorkersHours, 0, 0);
+                    var dateOfStartingWorkers = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day + 1, _workersConfiguration.TimeOfStartingWorkersHoursUtc, 0, 0);
                     var timeOfWaitingMs = (dateOfStartingWorkers - utcNow).Milliseconds;
-
+           
                     await Task.Delay(timeOfWaitingMs, stoppingToken);
                 }
-
-                await _newsService.GenerateNewsAsync();
-
-                await Task.Delay(_workersConfiguration.BackgroundNewsGeneratorTimeOutSec * 100, stoppingToken);
             }
         }
     }

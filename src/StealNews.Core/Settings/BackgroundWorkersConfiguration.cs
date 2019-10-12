@@ -3,7 +3,7 @@
     public class BackgroundWorkersConfiguration
     {
         public int BackgroundNewsGeneratorTimeOutSec{ get; set; }
-        public int TimeOfStartingWorkersHours { get; set; }
-        public int TimeOfEndingWorkersHours { get; set; }
+        public int TimeOfStartingWorkersHoursUtc { get; set; }
+        public int TimeOfEndingWorkersHoursUtc { get; set; }
     }
 }
