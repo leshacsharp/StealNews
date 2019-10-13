@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StealNews.Core.Services.Abstraction;
 using StealNews.Model.Models.Service.News;
-using System.Threading.Tasks;
 
 namespace StealNews.WebAPI.Controllers
 {
@@ -18,9 +17,9 @@ namespace StealNews.WebAPI.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> Search([FromQuery]NewsFindFilter filter)
+        public IActionResult Search([FromQuery]NewsFindFilter filter)
         {
-            var news = await _newsService.FindAsync(filter);
+            var news = _newsService.Find(filter);
             return Ok(news);
         }   
     }

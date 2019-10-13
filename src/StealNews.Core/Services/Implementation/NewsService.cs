@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using StealNews.Model.Models.Service.News;
+using LinqKit;
 
 namespace StealNews.Core.Services.Implementation
 {
@@ -36,8 +37,7 @@ namespace StealNews.Core.Services.Implementation
                 var sourceValidator = componentsFabric.CreateSourceValidator();
                 var htmlParser = componentsFabric.CreateNewsParser();
 
-                var filterBySource = Builders<News>.Filter.Where(n => n.Source.SiteTitle == source.SiteTitle);
-                var newsBySource = await _newsRepository.FindAsync(filterBySource);
+                var newsBySource = _newsRepository.Read(n => n.Source.SiteTitle == source.SiteTitle);
                 var lastNews = newsBySource.OrderByDescending(n => n.Id).FirstOrDefault();
 
                 var partsOfNews = new List<PartOfNews>();
@@ -116,47 +116,51 @@ namespace StealNews.Core.Services.Implementation
             return generatedNews;
         }
 
-        public async Task<IEnumerable<News>> FindAsync(NewsFindFilter filterModel)
+        public IEnumerable<News> Find(NewsFindFilter filterModel)
         {
             if (filterModel == null)
             {
                 throw new ArgumentNullException(nameof(filterModel));
             }
 
-            if (filterModel.Count <= 0 || filterModel.Skip < 0)
+            if (filterModel.Count <= 0)
             {
-                return await Task.FromResult(Enumerable.Empty<News>());
+                return Enumerable.Empty<News>();
             }
 
-            var builder = Builders<News>.Filter;
-            var filter = builder.Empty;
+            var filter = PredicateBuilder.New<News>(n => true);
 
             if (filterModel.Categories != null)
             {
-                filter = filter & builder.Where(n => filterModel.Categories.Contains(n.Category.Title) || filterModel.Categories.Any(c => n.Category.SubCategories.Contains(c)));
+                filter = filter.And(n => filterModel.Categories.Contains(n.Category.Title) || filterModel.Categories.Any(c => n.Category.SubCategories.Contains(c)));
             }
 
             if (filterModel.Sources != null)
             {
-                filter = filter & builder.Where(n => filterModel.Sources.Contains(n.Source.SiteTitle));
+                filter = filter.And(n => filterModel.Sources.Contains(n.Source.SiteTitle));
             }
 
             if (filterModel.KeyWord != null)
             {
-                filter = filter & builder.Where(n => n.Title.Contains(filterModel.KeyWord) || n.Text.Contains(filterModel.KeyWord));
+                filter = filter.And(n => n.Title.Contains(filterModel.KeyWord) || n.Text.Contains(filterModel.KeyWord));
             }
 
             if (filterModel.From != null)
             {
-                filter = filter & builder.Where(n => n.CreatedDate >= filterModel.From);
+                filter = filter.And(n => n.CreatedDate >= filterModel.From);
             }
 
             if (filterModel.To != null)
             {
-                filter = filter & builder.Where(n => n.CreatedDate <= filterModel.To);
+                filter = filter.And(n => n.CreatedDate <= filterModel.To);
             }
 
-            return await _newsRepository.FindAsync(filter, filterModel.Count, filterModel.Skip);
+            var news = _newsRepository.Read(filter)
+                                      .Skip(filterModel.Skip)
+                                      .Take(filterModel.Count)
+                                      .OrderByDescending(n => n.CreatedDate)
+                                      .ToList();
+            return news;
         }
     }
 }

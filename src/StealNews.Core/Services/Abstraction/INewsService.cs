@@ -8,6 +8,6 @@ namespace StealNews.Core.Services.Abstraction
     public interface INewsService
     {
         Task<IEnumerable<News>> GenerateNewsAsync();
-        Task<IEnumerable<News>> FindAsync(NewsFindFilter filter);
+        IEnumerable<News> Find(NewsFindFilter filter);
     }
 }

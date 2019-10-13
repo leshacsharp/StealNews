@@ -16,17 +16,6 @@ namespace StealNews.DataProvider.Repositories.Implementation
 
         }
 
-        public async Task<IEnumerable<News>> FindAsync(FilterDefinition<News> filter, int count, int skip = 0)
-        {
-            var news = await Collection.Find(filter)
-                             .Skip(skip)
-                             .Limit(count)
-                             .SortByDescending(n => n.CreatedDate)
-                             .ToListAsync();
-
-            return news;
-        }
-
         public async Task<IEnumerable<Category>> GetCategoriesAsync()
         {
             FieldDefinition<News, Category> field = nameof(Category);
