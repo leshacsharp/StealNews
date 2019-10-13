@@ -5,6 +5,8 @@ using StealNews.DataProvider.Settings;
 using StealNews.Model.Entities;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
+using StealNews.Model.Dto;
 
 namespace StealNews.DataProvider.Repositories.Implementation
 {
@@ -16,26 +18,38 @@ namespace StealNews.DataProvider.Repositories.Implementation
 
         }
 
-        public async Task<IEnumerable<Category>> GetCategoriesAsync()
+        public IEnumerable<CategoryDto> GetCategories()
         {
-            FieldDefinition<News, Category> field = nameof(Category);
-            var filter = Builders<News>.Filter.Empty;
 
-            var cursor = await Collection.DistinctAsync(field, filter);
-            await cursor.MoveNextAsync();
+            var grCategories = (from n in Collection.AsQueryable()
+                                group n by n.Category.Title into grByCategory
+                                select new
+                                {
+                                    Title = grByCategory.Key,
+                                    Count = grByCategory.Count(),
+                                    SubCategories = grByCategory.Select(n => n.Category.SubCategories)
+                                }).ToList();
 
-            return cursor.Current;
+            return from c in grCategories
+                   select new CategoryDto()
+                   {
+                       Title = c.Title,
+                       Count = c.Count,
+                       SubCategories = c.SubCategories.SelectMany(sc => sc).Distinct()
+                   }; 
         }
 
-        public async Task<IEnumerable<Source>> GetSourcesAsync()
+        public IEnumerable<SourceDto> GetSources()
         {
-            FieldDefinition<News, Source> field = nameof(Source);
-            var filter = Builders<News>.Filter.Empty;
-
-            var cursor = await Collection.DistinctAsync(field, filter);
-            await cursor.MoveNextAsync();
-
-            return cursor.Current;
+            return (from n in Collection.AsQueryable()
+                    group n by n.Source into grBySources
+                    select new SourceDto()
+                    {
+                        SiteTitle = grBySources.Key.SiteTitle,
+                        SiteUrl = grBySources.Key.SiteUrl,
+                        SiteLogo = grBySources.Key.SiteLogo,
+                        Count = grBySources.Count()
+                    }).ToList();
         }
 
         public async Task BulkInsertAsync(IEnumerable<News> news)

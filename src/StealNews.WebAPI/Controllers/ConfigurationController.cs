@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using StealNews.Core.Services.Abstraction;
-using System.Threading.Tasks;
 
 namespace StealNews.WebAPI.Controllers
 {
@@ -16,9 +15,9 @@ namespace StealNews.WebAPI.Controllers
 
         [HttpGet]
         [Route("get")]
-        public async Task<IActionResult> GetConfiguration()
+        public IActionResult GetConfiguration()
         {
-            var configuration = await _configurationService.GetAsync();
+            var configuration = _configurationService.Get();
             return Ok(configuration);
         }
     }
