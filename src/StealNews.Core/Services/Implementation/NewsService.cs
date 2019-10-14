@@ -130,9 +130,14 @@ namespace StealNews.Core.Services.Implementation
 
             var filter = PredicateBuilder.New<News>(n => true);
 
-            if (filterModel.Categories != null)
+            if (filterModel.MainCategories != null)
             {
-                filter = filter.And(n => filterModel.Categories.Contains(n.Category.Title) || filterModel.Categories.Any(c => n.Category.SubCategories.Contains(c)));
+                filter = filter.And(n => filterModel.MainCategories.Contains(n.Category.Title));
+            }
+
+            if (filterModel.SubCategories != null)
+            {
+                filter = filter.And(n => filterModel.SubCategories.Any(c => n.Category.SubCategories.Contains(c)));
             }
 
             if (filterModel.Sources != null)

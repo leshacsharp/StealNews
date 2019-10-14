@@ -14,7 +14,9 @@ namespace StealNews.Model.Models.Service.News
 
         public IEnumerable<string> Sources { get; set; }
 
-        public IEnumerable<string> Categories { get; set; }
+        public IEnumerable<string> MainCategories { get; set; }
+
+        public IEnumerable<string> SubCategories { get; set; }
 
         public int Count { get; set; }
 
