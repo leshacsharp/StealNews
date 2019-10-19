@@ -33,10 +33,7 @@ namespace StealNews.Model.Entities
             if(news == null)
                 return false;
 
-            return news.Title == this.Title 
-                && news.Category.Title == this.Category.Title 
-                && news.Text == this.Text 
-                && news.Source.SiteTitle == this.Source.SiteTitle;
+            return news.Url == this.Url;   
         }
     }
 }

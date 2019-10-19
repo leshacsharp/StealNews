@@ -82,16 +82,22 @@ namespace StealNews.Core.Parser.Implementation
             return $"{siteUri.Scheme}://{siteUri.Host}";
         }
 
-        private DateTime ParseDate(string date)
+        private DateTime ParseDate(string dateTime)
         {
-            var parsedDate = date.Split(",")[0];
-            var partsOfDate = parsedDate.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            var parsedDate = dateTime.Split(",");
+            var date = parsedDate[0];
+            var time = parsedDate[1];
 
-            var day = Convert.ToInt32(partsOfDate[0]);
+            var partsOfDate = date.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+            var day = int.Parse(partsOfDate[0]);
             var month = Common.Helpers.DateHepler.GetMonthByName(partsOfDate[1]);
-            var year = Convert.ToInt32(partsOfDate[2]);
+            var year = int.Parse(partsOfDate[2]);
 
-            return new DateTime(year, month, day);
+            var partsOfTime = time.Split(":", StringSplitOptions.RemoveEmptyEntries);
+            var hours = int.Parse(partsOfTime[0]);
+            var minutes = int.Parse(partsOfTime[1]);
+
+            return new DateTime(year, month, day, hours, minutes, 0);
         }
     }
 }

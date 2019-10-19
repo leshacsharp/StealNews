@@ -53,7 +53,7 @@ namespace StealNews.Core.Services.Implementation
                     sourcesUrl = await sourceValidator.ValidateAsync(sourcesUrl);
                     sourcesUrl = sourcesUrl.Reverse();
 
-                    newNewsBySource = new List<News>();
+                    newNewsBySource = new List<News>();    
 
                     foreach (var sourceUrl in sourcesUrl)
                     {
@@ -161,9 +161,9 @@ namespace StealNews.Core.Services.Implementation
             }
 
             var news = _newsRepository.Read(filter)
+                                      .OrderByDescending(n => n.CreatedDate)
                                       .Skip(filterModel.Skip)
                                       .Take(filterModel.Count)
-                                      .OrderByDescending(n => n.CreatedDate)
                                       .ToList();
             return news;
         }
