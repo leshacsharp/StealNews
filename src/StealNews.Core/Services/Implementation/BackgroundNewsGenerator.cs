@@ -25,8 +25,9 @@ namespace StealNews.Core.Services.Implementation
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var currentHours = DateTime.UtcNow.Hour;
-                if (currentHours > _workersConfiguration.TimeOfStartingWorkersHoursUtc && currentHours < _workersConfiguration.TimeOfEndingWorkersHoursUtc)
+                var utcNow = DateTime.UtcNow;
+
+                if (utcNow.Hour > _workersConfiguration.TimeOfStartingWorkersHoursUtc && utcNow.Hour < _workersConfiguration.TimeOfEndingWorkersHoursUtc)
                 {
                     await _newsService.GenerateNewsAsync();
 
@@ -34,10 +35,20 @@ namespace StealNews.Core.Services.Implementation
                 }
                 else
                 {
-                    var utcNow = DateTime.UtcNow;
-                    var dateOfStartingWorkers = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day + 1, _workersConfiguration.TimeOfStartingWorkersHoursUtc, 0, 0);
-                    var timeOfWaitingMs = (dateOfStartingWorkers - utcNow).Milliseconds;
-           
+                    var timeOfWaitingMs = 0;
+
+                    if (utcNow.Hour < _workersConfiguration.TimeOfStartingWorkersHoursUtc)
+                    {
+                        var timeOfStarting = new TimeSpan(_workersConfiguration.TimeOfStartingWorkersHoursUtc, 0, 0);
+                        var currentTime = new TimeSpan(utcNow.Hour, utcNow.Minute, utcNow.Second);
+                        timeOfWaitingMs = (int)(timeOfStarting - currentTime).TotalMilliseconds;
+                    }
+                    else
+                    {
+                        var dateOfStartingWorkers = new DateTime(utcNow.Year, utcNow.Month, utcNow.Day + 1, _workersConfiguration.TimeOfStartingWorkersHoursUtc, 0, 0);
+                        timeOfWaitingMs = (dateOfStartingWorkers - utcNow).Milliseconds;
+                    }       
+
                     await Task.Delay(timeOfWaitingMs, stoppingToken);
                 }
             }
