@@ -6,6 +6,8 @@ namespace StealNews.Model.Entities
     {
         public string Title { get; set; }
 
+        public string Image { get; set; }
+
         public IEnumerable<string> SubCategories { get; set; }
     }
 }

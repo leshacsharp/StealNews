@@ -20,12 +20,12 @@ namespace StealNews.DataProvider.Repositories.Implementation
 
         public IEnumerable<CategoryDto> GetCategories()
         {
-
             var grCategories = (from n in Collection.AsQueryable()
-                                group n by n.Category.Title into grByCategory
+                                group n by new { n.Category.Title, n.Category.Image } into grByCategory
                                 select new
                                 {
-                                    Title = grByCategory.Key,
+                                    Title = grByCategory.Key.Title,
+                                    Image = grByCategory.Key.Image,
                                     Count = grByCategory.Count(),
                                     SubCategories = grByCategory.Select(n => n.Category.SubCategories)
                                 }).ToList();
@@ -34,6 +34,7 @@ namespace StealNews.DataProvider.Repositories.Implementation
                    select new CategoryDto()
                    {
                        Title = c.Title,
+                       Image = c.Image,
                        Count = c.Count,
                        SubCategories = c.SubCategories.SelectMany(sc => sc).Distinct()
                    }; 
