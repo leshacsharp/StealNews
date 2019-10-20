@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace StealNews.Core.SourceValidators.Implementation
 {
@@ -31,8 +32,10 @@ namespace StealNews.Core.SourceValidators.Implementation
 
                 var haveContent = document.QuerySelector(".content_margin") != null;
                 var haveMainImage = document.QuerySelector(".main_img") != null;
+                var paragraphes = document.QuerySelectorAll(".js-mediator-article > p").Select(p => p.TextContent);
+                var haveText = paragraphes.Count() > 0 && !string.IsNullOrEmpty(string.Join("", paragraphes));
 
-                if(haveContent && haveMainImage)
+                if (haveContent && haveText && haveMainImage)
                 {
                     validatedSources.Add(source);
                 }

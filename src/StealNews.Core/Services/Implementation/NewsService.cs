@@ -53,7 +53,7 @@ namespace StealNews.Core.Services.Implementation
                     sourcesUrl = await sourceValidator.ValidateAsync(sourcesUrl);
                     sourcesUrl = sourcesUrl.Reverse();
 
-                    newNewsBySource = new List<News>();    
+                    newNewsBySource = new List<News>();
 
                     foreach (var sourceUrl in sourcesUrl)
                     {
@@ -78,7 +78,7 @@ namespace StealNews.Core.Services.Implementation
                     skipNews += _sourceConfiguration.CountGeneratedNewsFor1Time;
                 }
                 while (!isLastNewsFinded && lastNews != null && sourcesUrl.Count() > 0);
-
+                   
 
                 for (int i = partsOfNews.Count - 1; i >= 0; i--)
                 {

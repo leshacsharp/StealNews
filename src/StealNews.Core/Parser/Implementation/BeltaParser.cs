@@ -17,7 +17,8 @@ namespace StealNews.Core.Parser.Implementation
             var articleParagraps = document.QuerySelectorAll(".js-mediator-article > p").Select(p => p.TextContent);
             var articleText = string.Join(Environment.NewLine, articleParagraps);
 
-            var description = articleText.Substring(0, ParserConstants.COUNT_SYMBOLS_FOR_DESCRIPTIONS);
+            var countDescriptionSymbols = articleText.Length > ParserConstants.COUNT_SYMBOLS_FOR_DESCRIPTIONS ? ParserConstants.COUNT_SYMBOLS_FOR_DESCRIPTIONS : articleText.Length;
+            var description = articleText.Substring(0, countDescriptionSymbols);
             var words = description.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
             words.RemoveAt(words.Count - 1);
             var parsedDescription = $"{string.Join(" ", words)}...";
