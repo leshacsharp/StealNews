@@ -3,11 +3,14 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using StealNews.Core.Ioc;
 using StealNews.Core.Services.Implementation;
 using StealNews.Core.Settings;
 using StealNews.DataProvider.Ioc;
 using StealNews.DataProvider.Settings;
+using StealNews.Common.Logging;
+using StealNews.WebAPI.Filters;
 
 namespace StealNews.WebAPI
 {
@@ -22,8 +25,9 @@ namespace StealNews.WebAPI
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
-                             .AddMvcOptions(options => options.EnableEndpointRouting = false);
+            services.AddMvc(options => options.Filters.Add(typeof(ExceptionFilter)))
+                    .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                    .AddMvcOptions(options => options.EnableEndpointRouting = false);
                            
             services.AddDbDependencies();
             services.AddCoreDependencies();
@@ -36,8 +40,10 @@ namespace StealNews.WebAPI
             services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, BackgroundNewsGenerator>(p => new BackgroundNewsGenerator(services.BuildServiceProvider()));
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
+            Logger.Configure(loggerFactory);
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
