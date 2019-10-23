@@ -1,11 +1,11 @@
 ﻿using StealNews.Model.Entities;
 using System.Collections.Generic;
-using StealNews.Model.Models.Service.News;
+using System.Threading.Tasks;
 
 namespace StealNews.Core.Services.Abstraction
 {
-    public interface INewsService
+    public interface INewsGenerator
     {
-        IEnumerable<News> Find(NewsFindFilter filter);
+        Task<IEnumerable<News>> GenerateAsync();
     }
 }
