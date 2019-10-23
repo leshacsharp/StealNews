@@ -1,7 +1,7 @@
 ﻿using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
 using StealNews.Model.Models.Parser;
-using StealNews.Helpers.Common;
+using StealNews.Common.Helpers;
 using StealNews.Model.Entities;
 using System;
 using System.Threading.Tasks;
@@ -25,7 +25,7 @@ namespace StealNews.Core.Parser.Abstraction
             };
 
 
-            var html = await HttpReader.ReadAsync(source);
+            var html = await HttpHelper.ReadAsync(source);
             var htmlParser = new HtmlParser();
             var document = await htmlParser.ParseDocumentAsync(html);
 

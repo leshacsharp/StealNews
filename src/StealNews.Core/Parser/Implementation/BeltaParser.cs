@@ -59,7 +59,7 @@ namespace StealNews.Core.Parser.Implementation
             var subCategoriesTitles = document.QuerySelectorAll(".tag_item").Select(c => c.TextContent);
 
             var category = new Category()
-            {
+            {            
                 Title = categoryTitle,
                 SubCategories = subCategoriesTitles
             };

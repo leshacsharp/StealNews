@@ -2,9 +2,9 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace StealNews.Helpers.Common
+namespace StealNews.Common.Helpers
 {
-    public static class HttpReader
+    public static class HttpHelper
     {
         public static async Task<string> ReadAsync(string siteUrl)
         {

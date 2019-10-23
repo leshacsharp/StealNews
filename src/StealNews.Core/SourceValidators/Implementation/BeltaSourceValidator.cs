@@ -1,6 +1,6 @@
 ﻿using AngleSharp.Html.Parser;
 using StealNews.Core.SourceValidators.Abstraction;
-using StealNews.Helpers.Common;
+using StealNews.Common.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -27,7 +27,7 @@ namespace StealNews.Core.SourceValidators.Implementation
 
             foreach (var source in sources)
             {
-                var html = await HttpReader.ReadAsync(source, httpClient);
+                var html = await HttpHelper.ReadAsync(source, httpClient);
                 var document = await parser.ParseDocumentAsync(html, CancellationToken.None);
 
                 var haveContent = document.QuerySelector(".content_margin") != null;

@@ -1,7 +1,7 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Parser;
 using StealNews.Core.SourceGenerator.Abstraction;
-using StealNews.Helpers.Common;
+using StealNews.Common.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +47,7 @@ namespace StealNews.Core.SourceGenerator.Implementation
             do
             {   
                 var sourceUrl = string.Format(siteTemplate, page);
-                var html = await HttpReader.ReadAsync(sourceUrl, httpClient);
+                var html = await HttpHelper.ReadAsync(sourceUrl, httpClient);
 
                 var document = await parser.ParseDocumentAsync(html, CancellationToken.None);
                 htmlElements = document.QuerySelectorAll(".news_item.lenta_item > a");

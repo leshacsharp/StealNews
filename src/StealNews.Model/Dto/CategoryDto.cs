@@ -8,8 +8,8 @@ namespace StealNews.Model.Dto
 
         public string Image { get; set; }
 
-        public IEnumerable<string> SubCategories { get; set; }
-
         public int Count { get; set; }
+
+        public IEnumerable<string> SubCategories { get; set; }
     }
 }

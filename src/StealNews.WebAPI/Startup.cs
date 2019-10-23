@@ -30,7 +30,8 @@ namespace StealNews.WebAPI
 
             services.Configure<DbSettings>(Configuration.GetSection(nameof(DbSettings)));
             services.Configure<SourceConfiguration>(Configuration.GetSection(nameof(SourceConfiguration)));
-            services.Configure<BackgroundWorkersConfiguration>(Configuration.GetSection(nameof(BackgroundWorkersConfiguration)));
+            services.Configure<BackgroundWorkerConfiguration>(Configuration.GetSection(nameof(BackgroundWorkerConfiguration)));
+            services.Configure<InfoGeneratorsConfiguration>(Configuration.GetSection(nameof(InfoGeneratorsConfiguration)));
 
             services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, BackgroundNewsGenerator>(p => new BackgroundNewsGenerator(services.BuildServiceProvider()));
         }
