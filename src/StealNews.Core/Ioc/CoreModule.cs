@@ -13,6 +13,7 @@ namespace StealNews.Core.Ioc
             services.AddScoped<INewsService, NewsService>();
             services.AddScoped<IConfigurationService, ConfigurationService>();
 
+            services.AddScoped<INewsGenerator, NewsGenerator>();
             services.AddScoped<IInfoGenerator, CategoryImagesGenerator>();
         }
     }

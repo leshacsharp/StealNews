@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using StealNews.Core.ComponentsFactory;
+using StealNews.Core.InfoGenerator.Abstraction;
 using StealNews.Core.Services.Abstraction;
 using StealNews.Core.Settings;
 using StealNews.DataProvider.Repositories.Abstraction;
@@ -109,7 +110,16 @@ namespace StealNews.Core.Services.Implementation
                 }
             }
 
-            //_serviceProvider.GetRequiredService<>
+            var infoGenerators = _serviceProvider.GetServices<IInfoGenerator>();
+            var generatorTasks = new List<Task>();
+
+            foreach (var generator in infoGenerators)
+            {
+                var task = generator.ProcessAsync(generatedNews);
+                generatorTasks.Add(task);
+            }
+
+            await Task.WhenAll(generatorTasks);
 
             if (generatedNews.Count > 0)
             {
