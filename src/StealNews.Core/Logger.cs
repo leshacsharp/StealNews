@@ -16,7 +16,7 @@ namespace StealNews.Common.Logging
 
         public static ILogger GetLogger(Type type)
         {
-            if (type == null)
+            if(type == null)
             {
                 throw new ArgumentNullException(nameof(type));
             }

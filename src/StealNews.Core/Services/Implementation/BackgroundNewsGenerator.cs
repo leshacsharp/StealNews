@@ -7,11 +7,14 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Linq;
+using StealNews.Common.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace StealNews.Core.Services.Implementation
 {
     public class BackgroundNewsGenerator : BackgroundService
     {
+        private readonly ILogger _logger = Logger.GetLogger(typeof(BackgroundNewsGenerator));
         private readonly INewsGenerator _newsGenerator;
         private readonly BackgroundWorkerConfiguration _workersConfiguration;
 
@@ -24,7 +27,8 @@ namespace StealNews.Core.Services.Implementation
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //SendEmail($"Start Executing BackgroundNewsGenerator {DateTime.UtcNow} UTC");
+            _logger.LogInformation($"Start Executing BackgroundNewsGenerator - {DateTime.UtcNow} UTC");
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 var utcNow = DateTime.UtcNow;
@@ -33,9 +37,7 @@ namespace StealNews.Core.Services.Implementation
                 {
                     var generatedNews = await _newsGenerator.GenerateAsync();
 
-                    var envVarible = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-                    var env = string.IsNullOrEmpty(envVarible) ? "Production" : envVarible;
-                    var text = $" Enviroment={env} \n NowUtc={utcNow.ToString()} \n Count generated news={generatedNews.Count()} \n StartWorkingUtcHours={_workersConfiguration.TimeOfStartingWorkersHoursUtc}  EndWorkingUtcHours={_workersConfiguration.TimeOfEndingWorkersHoursUtc}  TimeOfPeriodMin={_workersConfiguration.BackgroundNewsGeneratorTimeOutSec / 60}  TimeOfPeriodSec={_workersConfiguration.BackgroundNewsGeneratorTimeOutSec}";
+                    _logger.LogInformation($"Count generated news: {generatedNews.Count()} - {utcNow} UTC");
 
                     await Task.Delay(_workersConfiguration.BackgroundNewsGeneratorTimeOutSec * 1000, stoppingToken);
                 }
@@ -55,12 +57,13 @@ namespace StealNews.Core.Services.Implementation
                         timeOfWaitingMs = (int)(dateOfStartingWorkers - utcNow).TotalMilliseconds;
                     }
 
-                    //SendEmail($"NowUtc: {utcNow.ToString()} \n TimeOfWaitingHours:{(double)timeOfWaitingMs / 1000 / 60 / 60} min  TimeOfWaitingMs:{timeOfWaitingMs}");
+                    _logger.LogInformation($"Time of waiting in hours:{(double)timeOfWaitingMs / 1000 / 60 / 60} Time of waiting in ms:{timeOfWaitingMs} - {utcNow} UTC");
+
                     await Task.Delay(timeOfWaitingMs, stoppingToken);
                 }
             }
 
-            //SendEmail($"End Executing BackgroundNewsGenerator \n stoppingToken.IsCancellationRequested={stoppingToken.IsCancellationRequested} \n {DateTime.UtcNow} UTC");
+            _logger.LogInformation($"End Executing BackgroundNewsGenerator - {DateTime.UtcNow} UTC");
         }
     }
 }

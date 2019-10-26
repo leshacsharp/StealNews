@@ -6,6 +6,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="logs\**" />
+    <Content Remove="logs\**" />
+    <EmbeddedResource Remove="logs\**" />
+    <None Remove="logs\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="2.2.0" />
@@ -15,13 +22,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\StealNews.Common\StealNews.Common.csproj" />
     <ProjectReference Include="..\StealNews.Core\StealNews.Core.csproj" />
     <ProjectReference Include="..\StealNews.DataProvider\StealNews.DataProvider.csproj" />
     <ProjectReference Include="..\StealNews.Model\StealNews.Model.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="logs\" />
+    <Content Update="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
