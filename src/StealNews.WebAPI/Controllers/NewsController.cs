@@ -21,6 +21,6 @@ namespace StealNews.WebAPI.Controllers
         {
             var news = _newsService.Find(filter);
             return Ok(news);
-        }   
+        }
     }
 }

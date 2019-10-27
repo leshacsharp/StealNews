@@ -35,11 +35,17 @@ namespace StealNews.Core.Services.Implementation
 
                 if (utcNow.Hour >= _workersConfiguration.TimeOfStartingWorkersHoursUtc && utcNow.Hour <= _workersConfiguration.TimeOfEndingWorkersHoursUtc)
                 {
-                    var generatedNews = await _newsGenerator.GenerateAsync();
+                    try
+                    {
+                        var generatedNews = await _newsGenerator.GenerateAsync();
+                        _logger.LogInformation($"Count generated news: {generatedNews.Count()} - {utcNow} UTC");
 
-                    _logger.LogInformation($"Count generated news: {generatedNews.Count()} - {utcNow} UTC");
-
-                    await Task.Delay(_workersConfiguration.BackgroundNewsGeneratorTimeOutSec * 1000, stoppingToken);
+                        await Task.Delay(_workersConfiguration.BackgroundNewsGeneratorTimeOutSec * 1000, stoppingToken);
+                    }
+                    catch(Exception ex)
+                    {
+                        _logger.LogError(ex, "Can't generate News");
+                    }  
                 }
                 else
                 {

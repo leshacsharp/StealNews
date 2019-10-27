@@ -1,12 +1,12 @@
 ﻿using AngleSharp.Html.Parser;
-using StealNews.Core.SourceValidators.Abstraction;
 using StealNews.Common.Helpers;
+using StealNews.Core.SourceValidators.Abstraction;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Linq;
 
 namespace StealNews.Core.SourceValidators.Implementation
 {
@@ -14,7 +14,7 @@ namespace StealNews.Core.SourceValidators.Implementation
     {
         public async Task<IEnumerable<string>> ValidateAsync(IEnumerable<string> sources)
         {
-            if(sources == null)
+            if (sources == null)
             {
                 throw new ArgumentNullException(nameof(sources));
             }

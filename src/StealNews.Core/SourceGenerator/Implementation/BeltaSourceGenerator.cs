@@ -30,8 +30,9 @@ namespace StealNews.Core.SourceGenerator.Implementation
  
             var sources = new List<string>();
 
-            var siteUri = new Uri(siteTemplate);
-            var baseSiteUrl = $"{siteUri.Scheme}://{siteUri.Host}";
+            var siteTemplateUri = new Uri(siteTemplate);
+            var baseSiteUrl = $"{siteTemplateUri.Scheme}://{siteTemplateUri.Host}";
+            var baseUri = new Uri(baseSiteUrl);
 
             var hch = new HttpClientHandler() { Proxy = null, UseProxy = false };
             var httpClient = new HttpClient(hch);
@@ -59,7 +60,8 @@ namespace StealNews.Core.SourceGenerator.Implementation
                     if (sources.Count == count)
                         break;
 
-                    sources.Add($"{baseSiteUrl}{sourceHref}");
+                    var sourceUri = new Uri(baseUri, sourceHref);
+                    sources.Add(sourceUri.AbsoluteUri); 
                 }
 
                 skipeditems = 0;
