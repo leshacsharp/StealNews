@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 using System.Linq;
 using StealNews.Common.Logging;
 using Microsoft.Extensions.Logging;
+using StealNews.Core.Managers.Abstraction;
+using System.Collections.Generic;
+using StealNews.Model.Entities;
+using System.Text;
 
 namespace StealNews.Core.Services.Implementation
 {
@@ -16,13 +20,18 @@ namespace StealNews.Core.Services.Implementation
     {
         private readonly ILogger _logger = Logger.GetLogger(typeof(BackgroundNewsGenerator));
         private readonly INewsGenerator _newsGenerator;
+        private readonly IWebSocketManager _webSocketManager;
         private readonly BackgroundWorkerConfiguration _workersConfiguration;
 
-        public BackgroundNewsGenerator(IServiceProvider provider)//INewsGenerator newsGenerator, IOptions<BackgroundWorkersConfiguration> workersConfiguration)  
+        public BackgroundNewsGenerator(IServiceScopeFactory serviceScopeFactory)
         {
-            //Todo: wait .net core updating for IHostedService to can give dependencies from ctor
-            _newsGenerator = provider.GetRequiredService<INewsGenerator>();
-            _workersConfiguration = provider.GetRequiredService<IOptions<BackgroundWorkerConfiguration>>().Value;
+            //IServiceScopeFactory needed because we can't to inject scoped services in constructor in singletone(BackgroundNewsGenerator)
+            using (var scope = serviceScopeFactory.CreateScope())
+            {
+                _newsGenerator = scope.ServiceProvider.GetRequiredService<INewsGenerator>();
+                _webSocketManager = scope.ServiceProvider.GetRequiredService<IWebSocketManager>();
+                _workersConfiguration = scope.ServiceProvider.GetRequiredService<IOptions<BackgroundWorkerConfiguration>>().Value;
+            }
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -38,8 +47,12 @@ namespace StealNews.Core.Services.Implementation
                     try
                     {
                         var generatedNews = await _newsGenerator.GenerateAsync();
-                        _logger.LogInformation($"Count generated news: {generatedNews.Count()} - {utcNow} UTC");
 
+                        _logger.LogInformation($"Count generated news: {generatedNews.Count()} - {utcNow} UTC");
+                        var generatedNewsInfo = GetGeneratedNewsInfo(generatedNews);
+
+                        await _webSocketManager.SendAllAsync(generatedNewsInfo);
+                        
                         await Task.Delay(_workersConfiguration.BackgroundNewsGeneratorTimeOutSec * 1000, stoppingToken);
                     }
                     catch(Exception ex)
@@ -70,6 +83,25 @@ namespace StealNews.Core.Services.Implementation
             }
 
             _logger.LogInformation($"End Executing BackgroundNewsGenerator - {DateTime.UtcNow} UTC");
+        }
+
+        private string GetGeneratedNewsInfo(IEnumerable<News> news)
+        {
+            var grNews = from n in news
+                         group n by n.Category.Title into grNewsByCategory
+                         select new
+                         {
+                             Title = grNewsByCategory.Key,
+                             Count = grNewsByCategory.Count()
+                         };                    
+
+            var builder = new StringBuilder();
+            foreach (var group in grNews)
+            {
+                builder.Append($"{group.Title}={group.Count};");
+            }
+
+            return builder.ToString();
         }
     }
 }

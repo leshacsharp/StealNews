@@ -5,12 +5,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using StealNews.Core.Ioc;
-using StealNews.Core.Services.Implementation;
 using StealNews.Core.Settings;
 using StealNews.DataProvider.Ioc;
 using StealNews.DataProvider.Settings;
 using StealNews.Common.Logging;
 using StealNews.WebAPI.Filters;
+using Microsoft.AspNetCore.Http;
+using StealNews.WebAPI.Middlewares;
 
 namespace StealNews.WebAPI
 {
@@ -36,8 +37,6 @@ namespace StealNews.WebAPI
             services.Configure<SourceConfiguration>(Configuration.GetSection(nameof(SourceConfiguration)));
             services.Configure<BackgroundWorkerConfiguration>(Configuration.GetSection(nameof(BackgroundWorkerConfiguration)));
             services.Configure<InfoGeneratorsConfiguration>(Configuration.GetSection(nameof(InfoGeneratorsConfiguration)));
-
-            services.AddSingleton<Microsoft.Extensions.Hosting.IHostedService, BackgroundNewsGenerator>(p => new BackgroundNewsGenerator(services.BuildServiceProvider()));
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
@@ -52,6 +51,9 @@ namespace StealNews.WebAPI
             {
                 app.UseHsts();
             }
+
+            app.UseWebSockets();
+            app.UseNewsWebSockets("/newsEndpoint");
 
             app.UseHttpsRedirection();
             app.UseMvc();

@@ -16,13 +16,13 @@ namespace StealNews.Core.Services.Implementation
 {
     public class NewsGenerator : INewsGenerator
     {
+        private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly INewsRepository _newsRepository;
         private readonly SourceConfiguration _sourceConfiguration;
-        private readonly IServiceProvider _serviceProvider;
 
-        public NewsGenerator(IServiceProvider serviceProvider, INewsRepository newsRepository, IOptions<SourceConfiguration> sources)
+        public NewsGenerator(IServiceScopeFactory serviceScopeFactory, INewsRepository newsRepository, IOptions<SourceConfiguration> sources)
         {
-            _serviceProvider = serviceProvider;
+            _serviceScopeFactory = serviceScopeFactory;
             _newsRepository = newsRepository;
             _sourceConfiguration = sources.Value;
         }
@@ -110,16 +110,20 @@ namespace StealNews.Core.Services.Implementation
                 }
             }
 
-            var infoGenerators = _serviceProvider.GetServices<IInfoGenerator>();
-            var generatorTasks = new List<Task>();
-
-            foreach (var generator in infoGenerators)
+            using (var scope = _serviceScopeFactory.CreateScope())
             {
-                var task = generator.ProcessAsync(generatedNews);
-                generatorTasks.Add(task);
-            }
+                var infoGenerators = scope.ServiceProvider.GetServices<IInfoGenerator>();
 
-            await Task.WhenAll(generatorTasks);
+                var generatorTasks = new List<Task>();
+
+                foreach (var generator in infoGenerators)
+                {
+                    var task = generator.ProcessAsync(generatedNews);
+                    generatorTasks.Add(task);
+                }
+
+                await Task.WhenAll(generatorTasks);
+            }
 
             if (generatedNews.Count > 0)
             {
