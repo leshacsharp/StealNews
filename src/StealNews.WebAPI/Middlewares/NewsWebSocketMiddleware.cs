@@ -28,13 +28,11 @@ namespace StealNews.WebAPI.Middlewares
                     var buffer = new byte[1024 * 4];
                     var arraySegment = new ArraySegment<byte>(buffer);
 
-                    var result = await socket.ReceiveAsync(arraySegment, System.Threading.CancellationToken.None);
-
-                    if (result.MessageType == WebSocketMessageType.Close)
-                    {
-                        await _webSocketManager.OnDisconnectedAsync(socket);
-                    }
+                    var result = await socket.ReceiveAsync(arraySegment, System.Threading.CancellationToken.None);  
+                    //todo: make handling message
                 }
+
+                await _webSocketManager.OnDisconnectedAsync(socket);
             }
         }
     }

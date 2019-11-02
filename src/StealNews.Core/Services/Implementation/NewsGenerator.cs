@@ -45,8 +45,8 @@ namespace StealNews.Core.Services.Implementation
                 var partsOfNews = new List<PartOfNews>();
                 IEnumerable<string> sourcesUrl = null;
                 ICollection<News> newNewsBySource = null;
+                var isNeedContinue = false;
                 var isLastNewsFinded = false;
-                var isPageHaveLastNews = false;
                 var skipNews = 0;
 
                 do
@@ -62,8 +62,7 @@ namespace StealNews.Core.Services.Implementation
                         var news = await htmlParser.ParseAsync(sourceUrl);
 
                         if (news.Equals(lastNews) || lastNews == null)
-                        {
-                            isPageHaveLastNews = true;
+                        { 
                             isLastNewsFinded = true;
                         }
 
@@ -73,47 +72,57 @@ namespace StealNews.Core.Services.Implementation
                     var partOfNews = new PartOfNews()
                     {
                         News = newNewsBySource,
-                        IsPageHaveLastNews = isPageHaveLastNews
+                        IsPageHaveLastNews = isLastNewsFinded
                     };
 
                     partsOfNews.Add(partOfNews);
                     skipNews += _sourceConfiguration.CountGeneratedNewsFor1Time;
+
+                    isNeedContinue = !isLastNewsFinded &&   
+                                     sourcesUrl.Count() > 0 &&
+                                     skipNews < _sourceConfiguration.MaxScaningNewsIfLastNewsNotFound;
                 }
-                while (!isLastNewsFinded && lastNews != null && sourcesUrl.Count() > 0);
+                while (isNeedContinue);
 
-
-                for (int i = partsOfNews.Count - 1; i >= 0; i--)
+                if (isLastNewsFinded)
                 {
-                    var part = partsOfNews[i];
-
-                    if (part.IsPageHaveLastNews)
+                    for (int i = partsOfNews.Count - 1; i >= 0; i--)
                     {
-                        isLastNewsFinded = false;
+                        var part = partsOfNews[i];
 
-                        foreach (var news in part.News)
+                        if (part.IsPageHaveLastNews)
                         {
-                            if (isLastNewsFinded)
-                            {
-                                generatedNews.Add(news);
-                            }
+                            isLastNewsFinded = false;
 
-                            if (news.Equals(lastNews) || lastNews == null)
+                            foreach (var news in part.News)
                             {
-                                isLastNewsFinded = true;
+                                if (isLastNewsFinded)
+                                {
+                                    generatedNews.Add(news);
+                                }
+
+                                if (news.Equals(lastNews) || lastNews == null)
+                                {
+                                    isLastNewsFinded = true;
+                                }
                             }
                         }
+                        else
+                        {
+                            generatedNews.AddRange(part.News);
+                        }
                     }
-                    else
-                    {
-                        generatedNews.AddRange(part.News);
-                    }
+                }
+                else
+                {
+                    var newLastNews = partsOfNews.FirstOrDefault().News.LastOrDefault();
+                    generatedNews.Add(newLastNews);
                 }
             }
 
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var infoGenerators = scope.ServiceProvider.GetServices<IInfoGenerator>();
-
                 var generatorTasks = new List<Task>();
 
                 foreach (var generator in infoGenerators)

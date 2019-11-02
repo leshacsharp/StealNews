@@ -10,7 +10,6 @@ using StealNews.DataProvider.Ioc;
 using StealNews.DataProvider.Settings;
 using StealNews.Common.Logging;
 using StealNews.WebAPI.Filters;
-using Microsoft.AspNetCore.Http;
 using StealNews.WebAPI.Middlewares;
 
 namespace StealNews.WebAPI

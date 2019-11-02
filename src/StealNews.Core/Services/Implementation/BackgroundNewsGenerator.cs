@@ -46,11 +46,13 @@ namespace StealNews.Core.Services.Implementation
                 {
                     try
                     {
+                        _logger.LogInformation($"Start Generating news - {DateTime.UtcNow} UTC");
+
                         var generatedNews = await _newsGenerator.GenerateAsync();
 
                         _logger.LogInformation($"Count generated news: {generatedNews.Count()} - {utcNow} UTC");
                         var generatedNewsInfo = GetGeneratedNewsInfo(generatedNews);
-
+                        
                         await _webSocketManager.SendAllAsync(generatedNewsInfo);
                         
                         await Task.Delay(_workersConfiguration.BackgroundNewsGeneratorTimeOutSec * 1000, stoppingToken);

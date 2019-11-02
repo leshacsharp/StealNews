@@ -7,5 +7,7 @@ namespace StealNews.Core.Settings
         public IEnumerable<Source> Sources { get; set; }
 
         public int CountGeneratedNewsFor1Time { get; set; }
+
+        public int MaxScaningNewsIfLastNewsNotFound { get; set; }
     }
 }
