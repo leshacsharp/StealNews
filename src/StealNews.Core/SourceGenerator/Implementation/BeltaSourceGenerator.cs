@@ -43,7 +43,7 @@ namespace StealNews.Core.SourceGenerator.Implementation
             var skipeditems = skip - skipedPage * countItemsOnPage;
             var page = skipedPage + 1;
 
-            IHtmlCollection<IElement> htmlElements = null;
+            List<string> hrefs = null;
 
             do
             {   
@@ -51,23 +51,21 @@ namespace StealNews.Core.SourceGenerator.Implementation
                 var html = await HttpHelper.ReadAsync(sourceUrl, httpClient);
 
                 var document = await parser.ParseDocumentAsync(html, CancellationToken.None);
-                htmlElements = document.QuerySelectorAll(".news_item.lenta_item > a");
+                hrefs = document.QuerySelectorAll(".news_item.lenta_item > a").Select(el => el.GetAttribute("href")).ToList();
 
-                for (int i = skipeditems; i < htmlElements.Count(); i++)
+                for (int i = skipeditems; i < hrefs.Count; i++)
                 {
-                    var sourceHref = htmlElements[i].GetAttribute("href");
-
                     if (sources.Count == count)
                         break;
 
-                    var sourceUri = new Uri(baseUri, sourceHref);
+                    var sourceUri = new Uri(baseUri, hrefs[i]);
                     sources.Add(sourceUri.AbsoluteUri); 
                 }
 
                 skipeditems = 0;
                 page++;
             }
-            while (sources.Count < count && htmlElements.Count() > 0);
+            while (sources.Count < count && hrefs.Count() > 0);
 
             return sources;
         }

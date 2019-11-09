@@ -11,14 +11,14 @@ namespace StealNews.Core.Parser.Implementation
 {
     public class BeltaParser : BaseNewsParser
     {
-        protected override Task<CommonInfo> ParseCommonInfoAsync(IHtmlDocument document)
+        protected override CommonInfo ParseCommonInfo(IHtmlDocument document)
         {
             var title = document.QuerySelector(".content_margin > h1").TextContent;
-            var articleParagraps = document.QuerySelectorAll(".js-mediator-article > p").Select(p => p.TextContent);
-            var articleText = string.Join(Environment.NewLine, articleParagraps);
+            var paragraps = document.QuerySelectorAll(".js-mediator-article > p").Select(p => p.TextContent);
+            var text = string.Join(Environment.NewLine, paragraps);
 
-            var countDescriptionSymbols = articleText.Length > ParserConstants.COUNT_SYMBOLS_FOR_DESCRIPTIONS ? ParserConstants.COUNT_SYMBOLS_FOR_DESCRIPTIONS : articleText.Length;
-            var description = articleText.Substring(0, countDescriptionSymbols);
+            var countDescriptionSymbols = text.Length > ParserConstants.COUNT_SYMBOLS_FOR_DESCRIPTIONS ? ParserConstants.COUNT_SYMBOLS_FOR_DESCRIPTIONS : text.Length;
+            var description = text.Substring(0, countDescriptionSymbols);
             var words = description.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
             words.RemoveAt(words.Count - 1);
             var parsedDescription = $"{string.Join(" ", words)}...";
@@ -29,15 +29,15 @@ namespace StealNews.Core.Parser.Implementation
             var commonInfo = new CommonInfo()
             {
                 Title = title,
-                Text = articleText,
+                Text = text,
                 Description = parsedDescription,
                 CreatedDate = date
             };
 
-            return Task.FromResult(commonInfo);
+            return commonInfo;
         }
 
-        protected override Task<Images> ParseImagesAsync(IHtmlDocument document)
+        protected override Images ParseImages(IHtmlDocument document)
         {
             var baseSiteUrl = GetBaseSiteUrl(document);
 
@@ -50,30 +50,30 @@ namespace StealNews.Core.Parser.Implementation
                 AdditionalImages = additionalImages
             };
 
-            return Task.FromResult(images);
+            return images;
         }
 
-        protected override Task<Category> ParseCategoriesAsync(IHtmlDocument document)
+        protected override Category ParseCategories(IHtmlDocument document)
         {
-            var categoryTitle = document.QuerySelector(".content_margin > a").TextContent;
-            var subCategoriesTitles = document.QuerySelectorAll(".tag_item").Select(c => c.TextContent);
+            var mainCategory = document.QuerySelector(".content_margin > a").TextContent;
+            var subCategories = document.QuerySelectorAll(".tag_item").Select(c => c.TextContent);
 
             var category = new Category()
             {            
-                Title = categoryTitle,
-                SubCategories = subCategoriesTitles
+                Title = mainCategory,
+                SubCategories = subCategories
             };
 
-            return Task.FromResult(category);
+            return category;
         }
 
-        protected override Task<string> ParseSourceLogoAsync(IHtmlDocument document)
+        protected override string ParseSourceLogo(IHtmlDocument document)
         {
             var baseSiteUrl = GetBaseSiteUrl(document);
             var logoUrl = document.QuerySelector("link[rel=icon]").GetAttribute("href");
             var fullLogoUrl = $"{baseSiteUrl}{logoUrl}";
 
-            return Task.FromResult(fullLogoUrl);
+            return fullLogoUrl;
         }
 
         private string GetBaseSiteUrl(IHtmlDocument document)

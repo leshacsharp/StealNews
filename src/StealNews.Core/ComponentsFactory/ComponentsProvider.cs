@@ -15,7 +15,8 @@ namespace StealNews.Core.ComponentsFactory
 
             switch(sourceTitle)
             {
-                case "belta.by": componentsFactory = new BeltaComponentsFactory(); break;    
+                case "belta.by": componentsFactory = new BeltaComponentsFactory(); break;
+                case "bbc.com": componentsFactory = new BBCComponentFactory(); break;
             }
 
             return componentsFactory;

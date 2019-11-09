@@ -60,7 +60,7 @@ namespace StealNews.Core.Services.Implementation
                     foreach (var sourceUrl in sourcesUrl)
                     {
                         var news = await htmlParser.ParseAsync(sourceUrl);
-
+                           
                         if (news.Equals(lastNews) || lastNews == null)
                         { 
                             isLastNewsFinded = true;

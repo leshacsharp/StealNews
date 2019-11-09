@@ -48,7 +48,7 @@ namespace StealNews.WebAPI
             }
             else
             {
-                app.UseHsts();
+                //app.UseHsts();
             }
 
             app.UseWebSockets();

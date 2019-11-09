@@ -25,11 +25,6 @@ namespace StealNews.Core.Managers.Implementation
 
         public async Task OnDisconnectedAsync(WebSocket socket)
         {
-            if (socket == null)
-            {
-                throw new ArgumentNullException(nameof(socket));
-            }
-
             var id = _webSocketService.GetSocketId(socket);
             var removedSocket = _webSocketService.Remove(id);
             await removedSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, CancellationToken.None);

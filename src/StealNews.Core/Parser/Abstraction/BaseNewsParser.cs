@@ -24,42 +24,39 @@ namespace StealNews.Core.Parser.Abstraction
                 SiteUrl = $"{uri.Scheme}://{uri.Host}",
             };
 
-
             var html = await HttpHelper.ReadAsync(source);
             var htmlParser = new HtmlParser();
             var document = await htmlParser.ParseDocumentAsync(html);
 
-            var commonInfoTask = ParseCommonInfoAsync(document);
-            var categoriesTask = ParseCategoriesAsync(document);
-            var imagesTask = ParseImagesAsync(document);
-            var sourceLogoTask = ParseSourceLogoAsync(document);
+            var commonInfo = ParseCommonInfo(document);
+            var categories = ParseCategories(document);
+            var images = ParseImages(document);
+            var sourceLogo = ParseSourceLogo(document);
 
-            await Task.WhenAll(commonInfoTask, categoriesTask, imagesTask, sourceLogoTask);
-
-            sourceInfo.SiteLogo = sourceLogoTask.Result;
+            sourceInfo.SiteLogo = sourceLogo;
 
             var newsItem = new News()
             {
-                Title = commonInfoTask.Result.Title,
+                Title = commonInfo.Title,
                 Url = source,
-                Text = commonInfoTask.Result.Text,
-                Description = commonInfoTask.Result.Description,
-                CreatedDate = commonInfoTask.Result.CreatedDate,
-                Category = categoriesTask.Result,
+                Text = commonInfo.Text,
+                Description = commonInfo.Description,
+                CreatedDate = commonInfo.CreatedDate,
+                Category = categories,
                 Source = sourceInfo,
-                MainImage = imagesTask.Result.MainImage,
-                Images = imagesTask.Result.AdditionalImages
+                MainImage = images.MainImage,
+                Images = images.AdditionalImages
             };
 
             return newsItem;
         }
 
-        protected abstract Task<CommonInfo> ParseCommonInfoAsync(IHtmlDocument document);
+        protected abstract CommonInfo ParseCommonInfo(IHtmlDocument document);
 
-        protected abstract Task<Category> ParseCategoriesAsync(IHtmlDocument document);
+        protected abstract Category ParseCategories(IHtmlDocument document);
 
-        protected abstract Task<Images> ParseImagesAsync(IHtmlDocument document);
+        protected abstract Images ParseImages(IHtmlDocument document);
 
-        protected abstract Task<string> ParseSourceLogoAsync(IHtmlDocument document);
+        protected abstract string ParseSourceLogo(IHtmlDocument document);
     }
 }

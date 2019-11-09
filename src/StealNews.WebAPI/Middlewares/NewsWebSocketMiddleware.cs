@@ -10,6 +10,7 @@ namespace StealNews.WebAPI.Middlewares
     {
         private readonly RequestDelegate _next;
         private readonly IWebSocketManager _webSocketManager;
+
         public NewsWebSocketMiddleware(RequestDelegate next, IWebSocketManager webSocketManager)
         {
             _next = next;
@@ -18,7 +19,7 @@ namespace StealNews.WebAPI.Middlewares
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if(context.WebSockets.IsWebSocketRequest)
+            if (context.WebSockets.IsWebSocketRequest)
             {
                 var socket = await context.WebSockets.AcceptWebSocketAsync();
                 _webSocketManager.OnConnected(socket);
@@ -28,7 +29,7 @@ namespace StealNews.WebAPI.Middlewares
                     var buffer = new byte[1024 * 4];
                     var arraySegment = new ArraySegment<byte>(buffer);
 
-                    var result = await socket.ReceiveAsync(arraySegment, System.Threading.CancellationToken.None);  
+                    var result = await socket.ReceiveAsync(arraySegment, System.Threading.CancellationToken.None);
                     //todo: make handling message
                 }
 
