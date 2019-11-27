@@ -13,7 +13,7 @@ namespace StealNews.Common.Helpers
                 throw new ArgumentNullException(nameof(mounth));
             }
 
-            var parsedMonth = mounth.Replace(" ", string.Empty).ToLower();
+            var parsedMonth = mounth.ToLower();
             var numberOfMounth = 0;
 
             for (int i = 0; i < _months.Length; i++)

@@ -13,6 +13,8 @@ using StealNews.Core.Managers.Abstraction;
 using System.Collections.Generic;
 using StealNews.Model.Entities;
 using System.Text;
+using StealNews.Model.Models.Service.Notification;
+using System.Text.Json;
 
 namespace StealNews.Core.Services.Implementation
 {
@@ -21,6 +23,7 @@ namespace StealNews.Core.Services.Implementation
         private readonly ILogger _logger = Logger.GetLogger(typeof(BackgroundNewsGenerator));
         private readonly INewsGenerator _newsGenerator;
         private readonly IWebSocketManager _webSocketManager;
+        private readonly INotificationService _notificationService;
         private readonly BackgroundWorkerConfiguration _workersConfiguration;
 
         public BackgroundNewsGenerator(IServiceScopeFactory serviceScopeFactory)
@@ -30,6 +33,7 @@ namespace StealNews.Core.Services.Implementation
             {
                 _newsGenerator = scope.ServiceProvider.GetRequiredService<INewsGenerator>();
                 _webSocketManager = scope.ServiceProvider.GetRequiredService<IWebSocketManager>();
+                _notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
                 _workersConfiguration = scope.ServiceProvider.GetRequiredService<IOptions<BackgroundWorkerConfiguration>>().Value;
             }
         }
@@ -51,16 +55,17 @@ namespace StealNews.Core.Services.Implementation
                         var generatedNews = await _newsGenerator.GenerateAsync();
 
                         _logger.LogInformation($"Count generated news: {generatedNews.Count()} - {utcNow} UTC");
-                        var generatedNewsInfo = GetGeneratedNewsInfo(generatedNews);
-                        
-                        await _webSocketManager.SendAllAsync(generatedNewsInfo);
-                        
+
+                        var newNewsNotifications = GetNewsNotifications(generatedNews);
+                        await SendNotificationsByFCMAsync(newNewsNotifications);
+                        await SendNotificationsBySocketAsync(newNewsNotifications);
+
                         await Task.Delay(_workersConfiguration.BackgroundNewsGeneratorTimeOutSec * 1000, stoppingToken);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         _logger.LogError(ex, "Can't generate News");
-                    }  
+                    }
                 }
                 else
                 {
@@ -87,23 +92,53 @@ namespace StealNews.Core.Services.Implementation
             _logger.LogInformation($"End Executing BackgroundNewsGenerator - {DateTime.UtcNow} UTC");
         }
 
-        private string GetGeneratedNewsInfo(IEnumerable<News> news)
+        private async Task SendNotificationsByFCMAsync(IEnumerable<NewsNotification> notifications)
+        {
+            foreach (var notification in notifications)
+            {
+                var message = new FCM.Net.Message()
+                {
+                    To = $"/topics/{notification.CategoryTitle}",
+                    Notification = new FCM.Net.Notification()
+                    {
+                        Title = "StealNews - apperead new news",
+                        Body = JsonSerializer.Serialize(notification)
+                    }
+                };
+
+                var response = await _notificationService.SendAsync(message);
+                if(response.StatusCode != System.Net.HttpStatusCode.OK)
+                {
+                    var warningMessage = $"FCM send {response.StatusCode} code. \nReason={response.ReasonPhrase} \nContent={response.Content}";
+                    _logger.LogWarning(warningMessage);
+                }
+            }
+        }
+
+        private async Task SendNotificationsBySocketAsync(IEnumerable<NewsNotification> notifications)
+        {
+            var builder = new StringBuilder();
+            foreach (var notification in notifications)
+            {
+                builder.Append($"{notification.CategoryTitle}={notification.CountNews};");
+            }
+            var generatedNewsInfo = builder.ToString();
+
+            await _webSocketManager.SendAllAsync(generatedNewsInfo);
+        }
+
+        private IEnumerable<NewsNotification> GetNewsNotifications(IEnumerable<News> news)
         {
             var grNews = from n in news
                          group n by n.Category.Title into grNewsByCategory
-                         select new
+                         select new NewsNotification()
                          {
-                             Title = grNewsByCategory.Key,
-                             Count = grNewsByCategory.Count()
-                         };                    
+                             CategoryTitle = grNewsByCategory.Key,
+                             CategoryImage = news.First(n => n.Category.Title == grNewsByCategory.Key).Category.Image,
+                             CountNews = grNewsByCategory.Count()
+                         };
 
-            var builder = new StringBuilder();
-            foreach (var group in grNews)
-            {
-                builder.Append($"{group.Title}={group.Count};");
-            }
-
-            return builder.ToString();
+            return grNews;
         }
     }
 }

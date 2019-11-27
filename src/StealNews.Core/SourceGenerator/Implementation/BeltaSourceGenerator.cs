@@ -59,7 +59,7 @@ namespace StealNews.Core.SourceGenerator.Implementation
                         break;
 
                     var sourceUri = new Uri(baseUri, hrefs[i]);
-                    sources.Add(sourceUri.AbsoluteUri); 
+                    sources.Add(sourceUri.AbsoluteUri);
                 }
 
                 skipeditems = 0;
