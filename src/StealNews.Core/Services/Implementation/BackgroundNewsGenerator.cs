@@ -98,7 +98,7 @@ namespace StealNews.Core.Services.Implementation
             {
                 var message = new FCM.Net.Message()
                 {
-                    To = $"/topics/{notification.CategoryTitle}",
+                    To = $"/topics/{notification.CategoryCode}",
                     Notification = new FCM.Net.Notification()
                     {
                         Title = "StealNews - apperead new news",
